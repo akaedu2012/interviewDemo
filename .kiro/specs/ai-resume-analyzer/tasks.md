@@ -213,7 +213,7 @@
   - 处理候选人不存在情况（返回 404）
   - _需求: 12, 15_
 
-- [ ] 6.5 实现候选人状态更新 API
+- [x] 6.5 实现候选人状态更新 API
   - 创建 `src/app/api/candidates/[id]/status/route.ts`（PATCH 方法）
   - 使用 Zod 验证状态值（待筛选/初筛通过/面试中/已录用/已淘汰）
   - 调用 Candidate Manager 的 `updateCandidateStatus()` 方法
