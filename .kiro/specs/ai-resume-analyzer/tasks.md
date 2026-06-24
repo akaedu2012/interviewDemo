@@ -54,7 +54,7 @@
   - 使用事务确保数据一致性
   - _需求: 10, 11, 13, 14_
 
-- [~] 2.2 实现岗位管理服务（Job Manager）
+- [x] 2.2 实现岗位管理服务（Job Manager）
   - 创建 `src/services/jobManager.ts`
   - 实现 `createOrUpdateJob()` 方法：创建或更新岗位描述（将旧的岗位设为 inactive）
   - 实现 `getActiveJob()` 方法：获取当前激活的岗位描述
