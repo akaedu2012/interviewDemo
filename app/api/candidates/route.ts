@@ -7,10 +7,10 @@ import type { ApiResponse, PaginatedResult, Candidate } from "@/types";
  * 查询参数验证 Schema
  */
 const queryParamsSchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).default(20),
-  sortBy: z.enum(["score", "uploadTime"]).optional().default("uploadTime"),
-  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+  page: z.string().optional(),
+  pageSize: z.string().optional(),
+  sortBy: z.enum(["score", "uploadTime"]).optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
   skills: z.string().optional(), // 逗号分隔的技能列表
   search: z.string().optional(), // 搜索关键词
 });
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     const validationResult = queryParamsSchema.safeParse(queryParamsObject);
     
     if (!validationResult.success) {
-      const errorMessages = validationResult.error.errors
+      const errorMessages = validationResult.error.issues
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
       
@@ -61,7 +61,44 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { page, pageSize, sortBy, sortOrder, skills, search } = validationResult.data;
+    // 手动处理和验证数值参数
+    const rawParams = validationResult.data;
+    let page = 1;
+    let pageSize = 20;
+
+    if (rawParams.page) {
+      const pageNum = Number(rawParams.page);
+      if (isNaN(pageNum) || !Number.isInteger(pageNum) || pageNum < 1) {
+        return NextResponse.json<ApiResponse>(
+          {
+            success: false,
+            error: "Invalid query parameters: page must be a positive integer",
+            code: "INVALID_INPUT",
+          },
+          { status: 400 }
+        );
+      }
+      page = pageNum;
+    }
+
+    if (rawParams.pageSize) {
+      const pageSizeNum = Number(rawParams.pageSize);
+      if (isNaN(pageSizeNum) || !Number.isInteger(pageSizeNum) || pageSizeNum < 1 || pageSizeNum > 100) {
+        return NextResponse.json<ApiResponse>(
+          {
+            success: false,
+            error: "Invalid query parameters: pageSize must be a positive integer between 1 and 100",
+            code: "INVALID_INPUT",
+          },
+          { status: 400 }
+        );
+      }
+      pageSize = pageSizeNum;
+    }
+
+    const sortBy = rawParams.sortBy || "uploadTime";
+    const sortOrder = rawParams.sortOrder || "desc";
+    const { skills, search } = rawParams;
 
     // 处理技能筛选（将逗号分隔的字符串转换为数组）
     const skillFilters = skills
