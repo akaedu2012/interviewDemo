@@ -76,7 +76,12 @@ export async function PATCH(
     // 使用 Zod 验证请求体
     const validationResult = candidateStatusSchema.safeParse(body);
     if (!validationResult.success) {
-      const errorMessage = validationResult.error.errors[0]?.message || "Invalid input";
+      // Get error message from Zod validation
+      const errors = validationResult.error.errors;
+      const errorMessage = errors && errors.length > 0 && errors[0]?.message 
+        ? errors[0].message 
+        : "Invalid status value. Must be one of: 待筛选, 初筛通过, 面试中, 已录用, 已淘汰";
+      
       return NextResponse.json(
         {
           success: false,
