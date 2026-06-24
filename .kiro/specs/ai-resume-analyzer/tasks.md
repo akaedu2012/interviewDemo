@@ -20,14 +20,14 @@
 
 ### 1. 项目初始化和基础设施搭建
 
-- [ ] 1.1 初始化 Next.js 项目并配置基础工具
+- [x] 1.1 初始化 Next.js 项目并配置基础工具
   - 使用 `npx create-next-app@latest` 创建项目，选择 TypeScript、App Router、Tailwind CSS
   - 配置 ESLint 和 Prettier
   - 配置 TypeScript strict 模式
   - 安装 shadcn/ui CLI 并初始化：`npx shadcn-ui@latest init`
   - _需求: 15, 16_
 
-- [ ] 1.2 设置 SQLite 数据库和 ORM
+- [x] 1.2 设置 SQLite 数据库和 ORM
   - 安装 Drizzle ORM 和 better-sqlite3：`npm install drizzle-orm better-sqlite3`
   - 安装开发依赖：`npm install -D drizzle-kit @types/better-sqlite3`
   - 创建 `src/db/schema.ts` 定义所有数据库表结构（candidates, education, experience, skills, job_descriptions, match_scores）
@@ -35,7 +35,7 @@
   - 创建数据库迁移脚本并执行初始化
   - _需求: 14_
 
-- [ ] 1.3 创建项目目录结构和类型定义
+- [x] 1.3 创建项目目录结构和类型定义
   - 创建目录：`src/components`, `src/services`, `src/lib`, `src/types`, `src/app/api`
   - 创建 `src/types/index.ts` 定义所有 TypeScript 类型和接口（Candidate, Education, Experience, SkillEntry, JobDescription, MatchScore, CandidateStatus）
   - 创建 `src/lib/constants.ts` 定义常量（候选人状态枚举、文件大小限制、分页配置）
@@ -44,7 +44,7 @@
 
 ### 2. 数据库访问层实现
 
-- [ ] 2.1 实现候选人管理服务（Candidate Manager）
+- [x] 2.1 实现候选人管理服务（Candidate Manager）
   - 创建 `src/services/candidateManager.ts`
   - 实现 `createCandidate()` 方法：插入候选人及其关联的教育、经历、技能数据
   - 实现 `getCandidateById()` 方法：查询候选人完整信息（包含关联数据）
@@ -54,7 +54,7 @@
   - 使用事务确保数据一致性
   - _需求: 10, 11, 13, 14_
 
-- [ ] 2.2 实现岗位管理服务（Job Manager）
+- [~] 2.2 实现岗位管理服务（Job Manager）
   - 创建 `src/services/jobManager.ts`
   - 实现 `createOrUpdateJob()` 方法：创建或更新岗位描述（将旧的岗位设为 inactive）
   - 实现 `getActiveJob()` 方法：获取当前激活的岗位描述
@@ -70,7 +70,7 @@
 
 ### 3. PDF解析和文件上传服务
 
-- [ ] 3.1 实现文件上传服务（Resume Upload Service）
+- [~] 3.1 实现文件上传服务（Resume Upload Service）
   - 创建 `src/services/resumeUpload.ts`
   - 实现 `validateFile()` 方法：验证文件格式（仅 PDF）和大小限制
   - 实现 `storeFile()` 方法：保存文件到 `public/uploads` 目录或配置的存储路径
@@ -78,7 +78,7 @@
   - 返回文件元数据（fileId, fileName, filePath, fileSize, uploadedAt）
   - _需求: 1_
 
-- [ ] 3.2 实现 PDF 解析服务（PDF Parser Service）
+- [~] 3.2 实现 PDF 解析服务（PDF Parser Service）
   - 安装 pdf-parse：`npm install pdf-parse`
   - 创建 `src/services/pdfParser.ts`
   - 实现 `parseResume()` 方法：从 PDF 文件提取文本
@@ -97,14 +97,14 @@
 
 ### 4. AI信息提取服务实现
 
-- [ ] 4.1 配置 AI API 客户端
+- [~] 4.1 配置 AI API 客户端
   - 安装 OpenAI SDK：`npm install openai` 或 Anthropic SDK：`npm install @anthropic-ai/sdk`
   - 创建 `src/lib/aiClient.ts` 初始化 AI 客户端
   - 在 `.env.local` 中配置 API 密钥
   - 创建错误处理包装器处理 API 限流和超时
   - _需求: 3, 4, 5, 6_
 
-- [ ] 4.2 实现 AI 提取服务 - 基本信息提取
+- [~] 4.2 实现 AI 提取服务 - 基本信息提取
   - 创建 `src/services/aiExtractor.ts`
   - 设计基本信息提取的 prompt 模板（要求返回 JSON 格式）
   - 实现 `extractBasicInfo()` 方法：提取姓名、电话、邮箱、城市
@@ -112,25 +112,25 @@
   - 处理字段缺失情况（返回 null）
   - _需求: 3_
 
-- [ ] 4.3 实现 AI 提取服务 - 教育背景提取
+- [~] 4.3 实现 AI 提取服务 - 教育背景提取
   - 设计教育背景提取的 prompt 模板
   - 实现 `extractEducation()` 方法：提取学校、专业、学位、毕业时间数组
   - 使用 Zod schema 验证返回数据
   - _需求: 4_
 
-- [ ] 4.4 实现 AI 提取服务 - 工作经历提取
+- [~] 4.4 实现 AI 提取服务 - 工作经历提取
   - 设计工作经历提取的 prompt 模板
   - 实现 `extractExperience()` 方法：提取公司、职位、起止日期、职责描述数组
   - 使用 Zod schema 验证返回数据
   - _需求: 5_
 
-- [ ] 4.5 实现 AI 提取服务 - 技能标签提取
+- [~] 4.5 实现 AI 提取服务 - 技能标签提取
   - 设计技能提取的 prompt 模板
   - 实现 `extractSkills()` 方法：提取技术技能、工具、编程语言数组
   - 实现技能标签标准化逻辑（统一大小写、同义词映射）
   - _需求: 6_
 
-- [ ] 4.6 实现流式提取功能（SSE 支持）
+- [~] 4.6 实现流式提取功能（SSE 支持）
   - 实现 `extractAll()` 异步生成器方法：按阶段依次提取所有信息
   - 在每个提取阶段完成后 yield 进度数据
   - 定义 ExtractionProgress 类型（stage: 'basic' | 'education' | 'experience' | 'skills' | 'complete'）
@@ -146,7 +146,7 @@
 
 ### 5. 岗位匹配和评分服务实现
 
-- [ ] 5.1 实现技能匹配评分算法
+- [~] 5.1 实现技能匹配评分算法
   - 创建 `src/services/jobMatcher.ts`
   - 实现 `calculateSkillScore()` 方法：
     - 计算必备技能匹配度（权重 60%）
@@ -156,13 +156,13 @@
   - 实现技能匹配逻辑（忽略大小写、支持部分匹配）
   - _需求: 8_
 
-- [ ] 5.2 实现经历和教育评分（AI 辅助）
+- [~] 5.2 实现经历和教育评分（AI 辅助）
   - 实现 `calculateExperienceScore()` 方法：使用 AI 分析经历与岗位描述的相关性
   - 实现 `calculateEducationScore()` 方法：使用 AI 分析教育背景的匹配度
   - 设计 prompt 要求 AI 返回 0-100 分数和简短理由
   - _需求: 8_
 
-- [ ] 5.3 实现综合匹配评分和评论生成
+- [~] 5.3 实现综合匹配评分和评论生成
   - 实现 `calculateMatch()` 方法：协调所有子评分计算
   - 计算总分：`(skillScore * 0.4) + (experienceScore * 0.4) + (educationScore * 0.2)`
   - 使用 AI 生成综合评论（描述候选人优势和不足）
@@ -177,7 +177,7 @@
 
 ### 6. 后端 API 路由实现
 
-- [ ] 6.1 实现简历上传 API
+- [~] 6.1 实现简历上传 API
   - 创建 `src/app/api/resumes/upload/route.ts`
   - 使用 Next.js FormData 处理多文件上传
   - 验证文件格式和大小（最多 5 个文件）
@@ -186,7 +186,7 @@
   - 处理错误并返回标准错误响应（400/500）
   - _需求: 1, 15_
 
-- [ ] 6.2 实现 AI 提取进度 SSE API
+- [~] 6.2 实现 AI 提取进度 SSE API
   - 创建 `src/app/api/resumes/[fileId]/extract/route.ts`
   - 设置 SSE 响应头（Content-Type: text/event-stream）
   - 调用 PDF Parser Service 提取文本
@@ -197,7 +197,7 @@
   - 处理错误并发送 error 事件
   - _需求: 2, 3, 4, 5, 6, 15_
 
-- [ ] 6.3 实现候选人列表查询 API
+- [~] 6.3 实现候选人列表查询 API
   - 创建 `src/app/api/candidates/route.ts`
   - 解析查询参数（page, pageSize, sortBy, sortOrder, skills, search）
   - 使用 Zod 验证查询参数
@@ -206,21 +206,21 @@
   - _需求: 10, 11, 15_
 
 
-- [ ] 6.4 实现候选人详情查询 API
+- [~] 6.4 实现候选人详情查询 API
   - 创建 `src/app/api/candidates/[id]/route.ts`
   - 调用 Candidate Manager 的 `getCandidateById()` 方法
   - 返回完整候选人信息（包括教育、经历、技能、匹配分数）
   - 处理候选人不存在情况（返回 404）
   - _需求: 12, 15_
 
-- [ ] 6.5 实现候选人状态更新 API
+- [~] 6.5 实现候选人状态更新 API
   - 创建 `src/app/api/candidates/[id]/status/route.ts`（PATCH 方法）
   - 使用 Zod 验证状态值（待筛选/初筛通过/面试中/已录用/已淘汰）
   - 调用 Candidate Manager 的 `updateCandidateStatus()` 方法
   - 返回更新后的状态和时间戳
   - _需求: 13, 15_
 
-- [ ] 6.6 实现匹配评分计算触发 API
+- [~] 6.6 实现匹配评分计算触发 API
   - 创建 `src/app/api/candidates/[id]/match/route.ts`（POST 方法）
   - 从请求体获取 jobId
   - 获取候选人信息和岗位描述
@@ -229,7 +229,7 @@
   - 返回 MatchResult
   - _需求: 8, 15_
 
-- [ ] 6.7 实现岗位描述管理 API
+- [~] 6.7 实现岗位描述管理 API
   - 创建 `src/app/api/jobs/route.ts`（POST 方法）
   - 使用 Zod 验证岗位描述数据（title, description, requiredSkills, preferredSkills）
   - 调用 Job Manager 的 `createOrUpdateJob()` 方法
@@ -248,7 +248,7 @@
 
 ### 7. 检查点 - 后端服务验证
 
-- [ ] 7.1 检查点：确保所有后端服务和 API 正常工作
+- [~] 7.1 检查点：确保所有后端服务和 API 正常工作
   - 手动测试文件上传流程
   - 手动测试 SSE 提取进度流
   - 手动测试候选人列表查询（分页、排序、筛选）
@@ -261,14 +261,14 @@
 
 ### 8. 通用 UI 组件开发
 
-- [ ] 8.1 安装和配置 shadcn/ui 核心组件
+- [~] 8.1 安装和配置 shadcn/ui 核心组件
   - 安装以下 shadcn/ui 组件：
     - `npx shadcn-ui@latest add button card input select badge dialog dropdown-menu toast table`
   - 配置 Tailwind CSS 主题（颜色、字体、间距）
   - 创建全局样式文件 `src/app/globals.css`
   - _需求: 16, 20_
 
-- [ ] 8.2 创建通用 UI 组件（基于 shadcn/ui）
+- [~] 8.2 创建通用 UI 组件（基于 shadcn/ui）
   - 创建 `src/components/ui/LoadingSpinner.tsx`：加载指示器组件
   - 创建 `src/components/ui/Modal.tsx`：模态对话框组件（基于 shadcn dialog）
   - 创建 `src/components/ui/Notification.tsx`：通知/Toast 组件（基于 shadcn toast）
@@ -276,7 +276,7 @@
   - 创建 `src/components/ui/ErrorBoundary.tsx`：React 错误边界组件
   - _需求: 16, 18, 19, 20_
 
-- [ ] 8.3 创建布局和导航组件
+- [~] 8.3 创建布局和导航组件
   - 创建 `src/components/layout/Header.tsx`：顶部导航栏（含 logo、导航链接）
   - 创建 `src/components/layout/Sidebar.tsx`：侧边栏菜单（可选）
   - 创建 `src/components/layout/Layout.tsx`：主布局容器
@@ -286,7 +286,7 @@
 
 ### 9. 简历上传功能前端实现
 
-- [ ] 9.1 实现文件上传组件
+- [~] 9.1 实现文件上传组件
   - 安装 react-dropzone：`npm install react-dropzone`
   - 创建 `src/components/upload/FileDropzone.tsx`
   - 实现拖拽上传和点击浏览功能
@@ -294,7 +294,7 @@
   - 显示文件选择提示和说明
   - _需求: 1_
 
-- [ ] 9.2 实现上传进度和状态显示组件
+- [~] 9.2 实现上传进度和状态显示组件
   - 创建 `src/components/upload/FileUploadProgress.tsx`：单个文件上传进度条
   - 创建 `src/components/upload/FileUploadList.tsx`：上传文件列表容器
   - 显示每个文件的状态（uploading, success, failed）
@@ -303,7 +303,7 @@
   - 提供重试按钮（失败时）
   - _需求: 1_
 
-- [ ] 9.3 实现上传页面和 SSE 提取进度展示
+- [~] 9.3 实现上传页面和 SSE 提取进度展示
   - 创建 `src/app/upload/page.tsx`
   - 集成 FileDropzone 和 FileUploadList 组件
   - 实现文件上传逻辑（调用 `/api/resumes/upload`）
@@ -323,7 +323,7 @@
 
 ### 10. 候选人列表功能前端实现
 
-- [ ] 10.1 实现候选人表格和卡片视图组件
+- [~] 10.1 实现候选人表格和卡片视图组件
   - 创建 `src/components/candidates/CandidateTable.tsx`
   - 使用 shadcn/ui Table 组件显示候选人列表
   - 显示列：姓名、总分、上传时间、状态
@@ -333,7 +333,7 @@
   - 以卡片形式显示候选人摘要信息
   - _需求: 10_
 
-- [ ] 10.2 实现筛选和排序控件
+- [~] 10.2 实现筛选和排序控件
   - 创建 `src/components/candidates/CandidateFilters.tsx`
   - 实现技能标签筛选（多选下拉框或标签列表）
   - 实现关键词搜索输入框（搜索姓名、技能、学校）
@@ -341,7 +341,7 @@
   - 实现排序选择器（按分数/上传时间，升序/降序）
   - _需求: 11_
 
-- [ ] 10.3 实现候选人列表容器和分页
+- [~] 10.3 实现候选人列表容器和分页
   - 创建 `src/components/candidates/CandidateList.tsx`
   - 管理表格视图和卡片视图切换
   - 集成筛选和排序控件
@@ -349,7 +349,7 @@
   - 显示筛选结果数量
   - _需求: 10, 11_
 
-- [ ] 10.4 实现主页（候选人列表页面）
+- [~] 10.4 实现主页（候选人列表页面）
   - 创建 `src/app/page.tsx`（首页）
   - 集成 CandidateList 组件
   - 实现数据获取逻辑（调用 `/api/candidates`）
@@ -369,7 +369,7 @@
 
 ### 11. 候选人详情功能前端实现
 
-- [ ] 11.1 实现候选人信息展示组件
+- [~] 11.1 实现候选人信息展示组件
   - 创建 `src/components/candidates/BasicInfoSection.tsx`：展示基本信息（姓名、电话、邮箱、城市）
   - 创建 `src/components/candidates/EducationSection.tsx`：展示教育背景列表
   - 创建 `src/components/candidates/ExperienceSection.tsx`：展示工作经历列表
@@ -377,7 +377,7 @@
   - 使用 Card 组件组织各个部分
   - _需求: 12_
 
-- [ ] 11.2 实现评分可视化组件
+- [~] 11.2 实现评分可视化组件
   - 安装 recharts：`npm install recharts`
   - 创建 `src/components/candidates/ScoreVisualization.tsx`
   - 实现雷达图展示四个维度分数（总分、技能、经历、教育）
@@ -387,7 +387,7 @@
   - _需求: 9_
 
 
-- [ ] 11.3 实现 AI 评论和状态管理组件
+- [~] 11.3 实现 AI 评论和状态管理组件
   - 创建 `src/components/candidates/AICommentary.tsx`：格式化展示 AI 生成的评论文本
   - 创建 `src/components/candidates/StatusSelector.tsx`
   - 使用 shadcn/ui Select 组件实现状态下拉选择器
@@ -396,14 +396,14 @@
   - 显示加载状态和成功/失败反馈
   - _需求: 9, 13_
 
-- [ ] 11.4 实现 PDF 预览组件
+- [~] 11.4 实现 PDF 预览组件
   - 创建 `src/components/candidates/PDFViewer.tsx`
   - 使用 `<embed>` 或 `<iframe>` 标签嵌入 PDF 文件
   - 提供下载按钮
   - 处理 PDF 加载失败情况
   - _需求: 12_
 
-- [ ] 11.5 实现候选人详情页面
+- [~] 11.5 实现候选人详情页面
   - 创建 `src/app/candidates/[id]/page.tsx`
   - 集成所有候选人详情展示组件
   - 实现数据获取逻辑（调用 `/api/candidates/[id]`）
@@ -423,7 +423,7 @@
 
 ### 12. 岗位配置功能前端实现
 
-- [ ] 12.1 实现岗位配置表单页面
+- [~] 12.1 实现岗位配置表单页面
   - 创建 `src/app/job-config/page.tsx`
   - 使用 shadcn/ui Form 组件创建表单
   - 实现岗位标题输入框（Input）
@@ -432,7 +432,7 @@
   - 实现加分技能标签输入（使用 TagInput 组件）
   - _需求: 7_
 
-- [ ] 12.2 实现表单验证和提交逻辑
+- [~] 12.2 实现表单验证和提交逻辑
   - 使用 Zod schema 定义表单验证规则
   - 验证岗位描述不为空
   - 验证至少有一个必备技能
@@ -451,7 +451,7 @@
 
 ### 13. 检查点 - 前端功能验证
 
-- [ ] 13.1 检查点：确保所有前端功能正常工作
+- [~] 13.1 检查点：确保所有前端功能正常工作
   - 手动测试完整的上传流程（拖拽文件 → 上传 → 实时进度 → 提取完成）
   - 手动测试候选人列表（筛选、排序、搜索、分页、视图切换）
   - 手动测试候选人详情（信息展示、评分可视化、PDF 预览、状态更新）
@@ -465,7 +465,7 @@
 
 ### 14. 错误处理和用户反馈优化
 
-- [ ] 14.1 实现全局错误处理
+- [~] 14.1 实现全局错误处理
   - 在 `src/app/layout.tsx` 中包裹 ErrorBoundary 组件
   - 创建 `src/lib/apiClient.ts`：封装 API 请求逻辑
   - 实现统一错误拦截和映射（将错误代码映射为用户友好消息）
@@ -473,21 +473,21 @@
   - 所有 API 错误通过 Toast 通知显示给用户
   - _需求: 18_
 
-- [ ] 14.2 完善加载状态管理
+- [~] 14.2 完善加载状态管理
   - 确保所有异步操作显示加载指示器
   - 异步操作期间禁用相关交互元素
   - 实现骨架屏（Skeleton）用于页面级加载
   - 确保加载指示器在操作完成后 300ms 内移除
   - _需求: 19_
 
-- [ ] 14.3 优化用户交互反馈
+- [~] 14.3 优化用户交互反馈
   - 确保所有按钮和链接有 hover、active、focus 状态样式
   - 确保所有用户操作在 100ms 内有视觉反馈
   - 实现操作成功的通知提示（使用 Toast）
   - 实现表单字段验证的即时反馈
   - _需求: 20_
 
-- [ ] 14.4 实现客户端表单验证
+- [~] 14.4 实现客户端表单验证
   - 为所有表单添加 Zod schema 验证
   - 在用户输入时显示实时验证错误
   - 阻止无效表单提交
@@ -496,7 +496,7 @@
 
 ### 15. 性能优化和代码质量提升
 
-- [ ] 15.1 实现前端性能优化
+- [~] 15.1 实现前端性能优化
   - 使用 Next.js Image 组件优化图片加载
   - 实现候选人列表虚拟滚动（如果数据量大）
   - 使用 React.memo 优化组件重渲染
@@ -504,7 +504,7 @@
   - 优化 PDF 文件加载（延迟加载、压缩）
   - _需求: 10, 12_
 
-- [ ] 15.2 代码重构和类型安全
+- [~] 15.2 代码重构和类型安全
   - 确保所有组件和函数有明确的 TypeScript 类型定义
   - 移除所有 `any` 类型（使用具体类型）
   - 提取重复代码为共享工具函数（创建 `src/lib/utils.ts`）
@@ -512,7 +512,7 @@
   - 运行 ESLint 修复所有 lint 警告
   - _需求: 16_
 
-- [ ] 15.3 添加日志和监控
+- [~] 15.3 添加日志和监控
   - 创建 `src/lib/logger.ts`：统一日志工具
   - 在所有 API 路由添加请求日志（请求方法、路径、状态码、耗时）
   - 在服务层添加关键操作日志（PDF 解析、AI 提取、评分计算）
@@ -533,7 +533,7 @@
 
 ### 16. 部署准备和文档
 
-- [ ] 16.1 配置环境变量和部署设置
+- [~] 16.1 配置环境变量和部署设置
   - 创建 `.env.example` 文件列出所有必需的环境变量
   - 配置数据库文件路径（生产环境使用持久化存储）
   - 配置文件上传目录（生产环境使用对象存储如 S3 或 Vercel Blob）
@@ -541,7 +541,7 @@
   - 创建 `next.config.js` 生产环境优化配置
   - _需求: 15_
 
-- [ ] 16.2 准备部署文档
+- [~] 16.2 准备部署文档
   - 编写 README.md：
     - 项目介绍和功能列表
     - 技术栈说明
@@ -556,7 +556,7 @@
     - 生产环境配置建议
   - _需求: 所有_
 
-- [ ] 16.3 创建 Docker 部署配置（可选）
+- [~] 16.3 创建 Docker 部署配置（可选）
   - 创建 `Dockerfile`：构建 Next.js 应用镜像
   - 创建 `docker-compose.yml`：编排应用和数据库
   - 配置持久化卷挂载（数据库文件、上传文件）
@@ -565,7 +565,7 @@
 
 ### 17. 最终检查点
 
-- [ ] 17.1 最终检查点：全面验证系统功能
+- [~] 17.1 最终检查点：全面验证系统功能
   - 使用真实简历测试完整流程（上传 → 提取 → 匹配 → 管理）
   - 验证 AI 提取准确性（测试至少 5 份不同格式的简历）
   - 验证评分算法合理性（检查分数是否符合预期）
