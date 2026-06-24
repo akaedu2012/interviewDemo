@@ -1,4 +1,13 @@
+'use client';
+
+import { FileDropzone } from '@/components/upload';
+
 export default function UploadPage() {
+  const handleFilesAccepted = (files: File[]) => {
+    console.log('Accepted files:', files);
+    // TODO: Implement file upload logic in next task
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -7,9 +16,7 @@ export default function UploadPage() {
           上传 PDF 格式的简历文件，系统将自动解析和分析
         </p>
       </div>
-      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-12 text-center">
-        <p className="text-muted-foreground">上传功能即将推出...</p>
-      </div>
+      <FileDropzone onFilesAccepted={handleFilesAccepted} maxFiles={5} />
     </div>
   );
 }
