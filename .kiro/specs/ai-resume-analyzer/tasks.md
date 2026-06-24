@@ -177,7 +177,7 @@
 
 ### 6. 后端 API 路由实现
 
-- [~] 6.1 实现简历上传 API
+- [x] 6.1 实现简历上传 API
   - 创建 `src/app/api/resumes/upload/route.ts`
   - 使用 Next.js FormData 处理多文件上传
   - 验证文件格式和大小（最多 5 个文件）
@@ -186,7 +186,7 @@
   - 处理错误并返回标准错误响应（400/500）
   - _需求: 1, 15_
 
-- [~] 6.2 实现 AI 提取进度 SSE API
+- [-] 6.2 实现 AI 提取进度 SSE API
   - 创建 `src/app/api/resumes/[fileId]/extract/route.ts`
   - 设置 SSE 响应头（Content-Type: text/event-stream）
   - 调用 PDF Parser Service 提取文本
@@ -197,7 +197,7 @@
   - 处理错误并发送 error 事件
   - _需求: 2, 3, 4, 5, 6, 15_
 
-- [~] 6.3 实现候选人列表查询 API
+- [ ] 6.3 实现候选人列表查询 API
   - 创建 `src/app/api/candidates/route.ts`
   - 解析查询参数（page, pageSize, sortBy, sortOrder, skills, search）
   - 使用 Zod 验证查询参数
@@ -206,21 +206,21 @@
   - _需求: 10, 11, 15_
 
 
-- [~] 6.4 实现候选人详情查询 API
+- [-] 6.4 实现候选人详情查询 API
   - 创建 `src/app/api/candidates/[id]/route.ts`
   - 调用 Candidate Manager 的 `getCandidateById()` 方法
   - 返回完整候选人信息（包括教育、经历、技能、匹配分数）
   - 处理候选人不存在情况（返回 404）
   - _需求: 12, 15_
 
-- [~] 6.5 实现候选人状态更新 API
+- [-] 6.5 实现候选人状态更新 API
   - 创建 `src/app/api/candidates/[id]/status/route.ts`（PATCH 方法）
   - 使用 Zod 验证状态值（待筛选/初筛通过/面试中/已录用/已淘汰）
   - 调用 Candidate Manager 的 `updateCandidateStatus()` 方法
   - 返回更新后的状态和时间戳
   - _需求: 13, 15_
 
-- [~] 6.6 实现匹配评分计算触发 API
+- [-] 6.6 实现匹配评分计算触发 API
   - 创建 `src/app/api/candidates/[id]/match/route.ts`（POST 方法）
   - 从请求体获取 jobId
   - 获取候选人信息和岗位描述
@@ -229,7 +229,7 @@
   - 返回 MatchResult
   - _需求: 8, 15_
 
-- [~] 6.7 实现岗位描述管理 API
+- [-] 6.7 实现岗位描述管理 API
   - 创建 `src/app/api/jobs/route.ts`（POST 方法）
   - 使用 Zod 验证岗位描述数据（title, description, requiredSkills, preferredSkills）
   - 调用 Job Manager 的 `createOrUpdateJob()` 方法
