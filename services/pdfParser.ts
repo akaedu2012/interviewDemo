@@ -3,9 +3,6 @@ import path from "path";
 import type { ParseResult } from "@/types";
 import { ERROR_CODES } from "@/lib/constants";
 
-// Import pdf-parse - it has named exports
-import { PDFParse, VerbosityLevel } from "pdf-parse";
-
 /**
  * PDF 解析服务
  * 负责从 PDF 文件提取文本内容并进行清理
@@ -109,26 +106,27 @@ export async function parseResume(filePath: string): Promise<ParseResult> {
 
     // 解析 PDF 文件 using pdf-parse API
     let pdfData: {
-      total: number;
+      numpages: number;
       text: string;
     };
 
     try {
-      // Create PDFParse instance with buffer data
+      // Dynamically require pdf-parse to avoid webpack bundling issues
+      const { PDFParse } = require("pdf-parse");
+      
+      // Create parser instance
       const parser = new PDFParse({
         data: dataBuffer,
-        verbosity: VerbosityLevel.ERRORS, // Only show errors
       });
-
-      // Extract text from the PDF
-      const result = await parser.getText();
       
+      // Extract text from PDF
+      const result = await parser.getText();
       pdfData = {
-        total: result.total,
+        numpages: result.total,
         text: result.text,
       };
-
-      // Clean up parser resources
+      
+      // Clean up
       await parser.destroy();
     } catch (parseError) {
       console.error("PDF parsing failed:", parseError);
@@ -169,7 +167,7 @@ export async function parseResume(filePath: string): Promise<ParseResult> {
     return {
       success: true,
       text: cleanedText,
-      pageCount: pdfData.total,
+      pageCount: pdfData.numpages,
     };
   } catch (error) {
     console.error("Unexpected error in parseResume:", error);
@@ -243,11 +241,8 @@ export async function getPDFMetadata(filePath: string): Promise<{
     const dataBuffer = await fs.readFile(fullPath);
 
     // 解析 PDF（只获取元数据）
-    const parser = new PDFParse({
-      data: dataBuffer,
-      verbosity: VerbosityLevel.ERRORS,
-    });
-    
+    const { PDFParse } = require("pdf-parse");
+    const parser = new PDFParse({ data: dataBuffer });
     const result = await parser.getText();
     await parser.destroy();
 
