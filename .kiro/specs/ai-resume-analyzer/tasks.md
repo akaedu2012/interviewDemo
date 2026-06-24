@@ -70,7 +70,7 @@
 
 ### 3. PDF解析和文件上传服务
 
-- [~] 3.1 实现文件上传服务（Resume Upload Service）
+- [x] 3.1 实现文件上传服务（Resume Upload Service）
   - 创建 `src/services/resumeUpload.ts`
   - 实现 `validateFile()` 方法：验证文件格式（仅 PDF）和大小限制
   - 实现 `storeFile()` 方法：保存文件到 `public/uploads` 目录或配置的存储路径
@@ -78,7 +78,7 @@
   - 返回文件元数据（fileId, fileName, filePath, fileSize, uploadedAt）
   - _需求: 1_
 
-- [~] 3.2 实现 PDF 解析服务（PDF Parser Service）
+- [x] 3.2 实现 PDF 解析服务（PDF Parser Service）
   - 安装 pdf-parse：`npm install pdf-parse`
   - 创建 `src/services/pdfParser.ts`
   - 实现 `parseResume()` 方法：从 PDF 文件提取文本
@@ -97,14 +97,14 @@
 
 ### 4. AI信息提取服务实现
 
-- [~] 4.1 配置 AI API 客户端
+- [x] 4.1 配置 AI API 客户端
   - 安装 OpenAI SDK：`npm install openai` 或 Anthropic SDK：`npm install @anthropic-ai/sdk`
   - 创建 `src/lib/aiClient.ts` 初始化 AI 客户端
   - 在 `.env.local` 中配置 API 密钥
   - 创建错误处理包装器处理 API 限流和超时
   - _需求: 3, 4, 5, 6_
 
-- [~] 4.2 实现 AI 提取服务 - 基本信息提取
+- [x] 4.2 实现 AI 提取服务 - 基本信息提取
   - 创建 `src/services/aiExtractor.ts`
   - 设计基本信息提取的 prompt 模板（要求返回 JSON 格式）
   - 实现 `extractBasicInfo()` 方法：提取姓名、电话、邮箱、城市
@@ -112,25 +112,25 @@
   - 处理字段缺失情况（返回 null）
   - _需求: 3_
 
-- [~] 4.3 实现 AI 提取服务 - 教育背景提取
+- [x] 4.3 实现 AI 提取服务 - 教育背景提取
   - 设计教育背景提取的 prompt 模板
   - 实现 `extractEducation()` 方法：提取学校、专业、学位、毕业时间数组
   - 使用 Zod schema 验证返回数据
   - _需求: 4_
 
-- [~] 4.4 实现 AI 提取服务 - 工作经历提取
+- [x] 4.4 实现 AI 提取服务 - 工作经历提取
   - 设计工作经历提取的 prompt 模板
   - 实现 `extractExperience()` 方法：提取公司、职位、起止日期、职责描述数组
   - 使用 Zod schema 验证返回数据
   - _需求: 5_
 
-- [~] 4.5 实现 AI 提取服务 - 技能标签提取
+- [x] 4.5 实现 AI 提取服务 - 技能标签提取
   - 设计技能提取的 prompt 模板
   - 实现 `extractSkills()` 方法：提取技术技能、工具、编程语言数组
   - 实现技能标签标准化逻辑（统一大小写、同义词映射）
   - _需求: 6_
 
-- [~] 4.6 实现流式提取功能（SSE 支持）
+- [x] 4.6 实现流式提取功能（SSE 支持）
   - 实现 `extractAll()` 异步生成器方法：按阶段依次提取所有信息
   - 在每个提取阶段完成后 yield 进度数据
   - 定义 ExtractionProgress 类型（stage: 'basic' | 'education' | 'experience' | 'skills' | 'complete'）
@@ -146,7 +146,7 @@
 
 ### 5. 岗位匹配和评分服务实现
 
-- [~] 5.1 实现技能匹配评分算法
+- [x] 5.1 实现技能匹配评分算法
   - 创建 `src/services/jobMatcher.ts`
   - 实现 `calculateSkillScore()` 方法：
     - 计算必备技能匹配度（权重 60%）
@@ -156,13 +156,13 @@
   - 实现技能匹配逻辑（忽略大小写、支持部分匹配）
   - _需求: 8_
 
-- [~] 5.2 实现经历和教育评分（AI 辅助）
+- [x] 5.2 实现经历和教育评分（AI 辅助）
   - 实现 `calculateExperienceScore()` 方法：使用 AI 分析经历与岗位描述的相关性
   - 实现 `calculateEducationScore()` 方法：使用 AI 分析教育背景的匹配度
   - 设计 prompt 要求 AI 返回 0-100 分数和简短理由
   - _需求: 8_
 
-- [~] 5.3 实现综合匹配评分和评论生成
+- [x] 5.3 实现综合匹配评分和评论生成
   - 实现 `calculateMatch()` 方法：协调所有子评分计算
   - 计算总分：`(skillScore * 0.4) + (experienceScore * 0.4) + (educationScore * 0.2)`
   - 使用 AI 生成综合评论（描述候选人优势和不足）
