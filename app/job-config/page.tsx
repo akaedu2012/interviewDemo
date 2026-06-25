@@ -158,13 +158,13 @@ export default function JobConfigPage() {
 
       <form onSubmit={handleSubmit}>
         <Card className="glass-hover border border-cyan-500/20 ring-0">
-          <CardHeader className="pb-6">
+          <CardHeader className="pb-6 px-8 pt-8">
             <div className="flex items-center space-x-2">
               <div className="h-6 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full" />
               <CardTitle className="text-2xl text-cyan-300">岗位信息</CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="space-y-8">
+          <CardContent className="space-y-8 px-8 pb-8">
             {/* 岗位标题 */}
             <div className="space-y-3">
               <Label htmlFor="title" className="text-base text-slate-200">
