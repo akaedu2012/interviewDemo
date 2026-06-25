@@ -34,7 +34,97 @@ export default function UploadPage() {
   };
 
   /**
+   * 使用简化 API 进行提取（非 SSE）
+   */
+  const extractWithSimpleAPI = useCallback(
+    async (fileId: string, uploadedFileId: string) => {
+      try {
+        // 更新状态为处理中
+        setUploadFiles((prev) =>
+          prev.map((file) =>
+            file.id === fileId
+              ? {
+                  ...file,
+                  status: 'processing' as UploadStatus,
+                  progress: 10,
+                  extractionStage: 'processing',
+                }
+              : file
+          )
+        );
+
+        // 调用简化 API
+        const response = await fetch(
+          `/api/resumes/${uploadedFileId}/extract-simple`,
+          {
+            method: 'POST',
+          }
+        );
+
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          // 提取成功
+          setUploadFiles((prev) =>
+            prev.map((file) =>
+              file.id === fileId
+                ? {
+                    ...file,
+                    status: 'success' as UploadStatus,
+                    progress: 100,
+                    extractionStage: 'complete',
+                  }
+                : file
+            )
+          );
+
+          Notification.success('简历提取完成', result.data.message);
+
+          // 检查是否所有文件都已完成
+          setUploadFiles((prev) => {
+            const allCompleted = prev.every(
+              (f) => f.status === 'success' || f.status === 'failed'
+            );
+            if (allCompleted) {
+              setTimeout(() => {
+                router.push('/');
+              }, 2000);
+            }
+            return prev;
+          });
+        } else {
+          throw new Error(result.error || '提取失败');
+        }
+      } catch (error) {
+        console.error('Extraction error:', error);
+
+        setUploadFiles((prev) =>
+          prev.map((file) =>
+            file.id === fileId
+              ? {
+                  ...file,
+                  status: 'failed' as UploadStatus,
+                  error:
+                    error instanceof Error
+                      ? error.message
+                      : '提取失败',
+                }
+              : file
+          )
+        );
+
+        Notification.error(
+          '提取失败',
+          error instanceof Error ? error.message : '请稍后重试'
+        );
+      }
+    },
+    [router]
+  );
+
+  /**
    * 连接 SSE 监听提取进度
+   * 注意：此方法在 Vercel 环境可能不稳定，建议使用 extractWithSimpleAPI
    */
   const connectExtractionSSE = useCallback(
     (fileId: string, uploadedFileId: string) => {
@@ -293,14 +383,15 @@ export default function UploadPage() {
             })
           );
 
-          // 为每个成功上传的文件建立 SSE 连接
+          // 为每个成功上传的文件使用简化 API 进行提取（不使用 SSE）
           uploads.forEach((upload: any) => {
             if (upload.status === 'uploaded' && upload.fileId) {
               const fileItem = newFileItems.find(
                 (item) => item.file.name === upload.fileName
               );
               if (fileItem) {
-                connectExtractionSSE(fileItem.id, upload.fileId);
+                // 使用简化 API 而不是 SSE
+                extractWithSimpleAPI(fileItem.id, upload.fileId);
               }
             }
           });
@@ -345,7 +436,7 @@ export default function UploadPage() {
         setIsUploading(false);
       }
     },
-    [isUploading, uploadFilesToServer, connectExtractionSSE]
+    [isUploading, uploadFilesToServer, extractWithSimpleAPI]
   );
 
   /**
