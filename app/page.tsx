@@ -126,16 +126,10 @@ export default function Home() {
     updateSearchParams({ sortBy: newSortBy, sortOrder: newSortOrder, page: 1 });
   };
 
-  // 处理搜索变化（使用防抖）
-  const handleSearchChange = React.useMemo(() => {
-    let timeoutId: NodeJS.Timeout;
-    return (keyword: string) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        updateSearchParams({ search: keyword, page: 1 });
-      }, 300);
-    };
-  }, [updateSearchParams]);
+  // 处理搜索变化（防抖已在CandidateFilters组件内部实现）
+  const handleSearchChange = (keyword: string) => {
+    updateSearchParams({ search: keyword, page: 1 });
+  };
 
   // 处理技能筛选切换
   const handleSkillToggle = (skill: string) => {
