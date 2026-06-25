@@ -60,10 +60,10 @@ export async function POST(request: NextRequest) {
     const validationResult = jobDescriptionSchema.safeParse(body);
     if (!validationResult.success) {
       // Get error message from Zod validation
-      const errors = validationResult.error.errors;
+      const issues = validationResult.error.issues;
       const errorMessage =
-        errors && errors.length > 0 && errors[0]?.message
-          ? errors[0].message
+        issues && issues.length > 0 && issues[0]?.message
+          ? issues[0].message
           : "Invalid input data";
 
       return NextResponse.json(

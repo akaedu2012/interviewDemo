@@ -5,9 +5,7 @@ import type { CandidateStatus } from "@/types";
 
 // Zod schema for validating candidate status
 const candidateStatusSchema = z.object({
-  status: z.enum(["待筛选", "初筛通过", "面试中", "已录用", "已淘汰"], {
-    errorMap: () => ({ message: "Invalid status value. Must be one of: 待筛选, 初筛通过, 面试中, 已录用, 已淘汰" }),
-  }),
+  status: z.enum(["待筛选", "初筛通过", "面试中", "已录用", "已淘汰"]),
 });
 
 /**
@@ -77,9 +75,9 @@ export async function PATCH(
     const validationResult = candidateStatusSchema.safeParse(body);
     if (!validationResult.success) {
       // Get error message from Zod validation
-      const errors = validationResult.error.errors;
-      const errorMessage = errors && errors.length > 0 && errors[0]?.message 
-        ? errors[0].message 
+      const issues = validationResult.error.issues;
+      const errorMessage = issues && issues.length > 0 && issues[0]?.message 
+        ? issues[0].message 
         : "Invalid status value. Must be one of: 待筛选, 初筛通过, 面试中, 已录用, 已淘汰";
       
       return NextResponse.json(

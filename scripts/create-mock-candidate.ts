@@ -123,7 +123,7 @@ async function createMockCandidate() {
       description: "我们正在寻找一位经验丰富的全栈工程师，负责前后端开发工作。需要熟练掌握 React、Node.js 等现代 Web 技术栈。",
       requiredSkills: JSON.stringify(["JavaScript", "React", "Node.js", "TypeScript"]),
       preferredSkills: JSON.stringify(["Next.js", "MongoDB", "Docker", "AWS"]),
-      isActive: 1,
+      isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });

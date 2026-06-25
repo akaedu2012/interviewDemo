@@ -104,7 +104,7 @@ export function Modal({
 }: ModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      {trigger && <DialogTrigger>{trigger}</DialogTrigger>}
       <DialogContent
         showCloseButton={showCloseButton}
         className={`${sizeClasses[size]} ${className || ""}`}

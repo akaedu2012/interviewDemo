@@ -173,6 +173,7 @@ export function TagInput({
       )}
       onClick={handleContainerClick}
       role="combobox"
+      aria-controls="tag-input-list"
       aria-expanded="false"
       aria-haspopup="listbox"
       aria-label="Tag input"

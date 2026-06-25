@@ -22,7 +22,8 @@ export function PageSizeSelector({
   pageSize,
   onPageSizeChange,
 }: PageSizeSelectorProps) {
-  const handleChange = (value: string) => {
+  const handleChange = (value: string | null) => {
+    if (!value) return;
     onPageSizeChange(parseInt(value, 10));
   };
 

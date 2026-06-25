@@ -29,7 +29,9 @@ export function CandidateSorter({
 }: CandidateSorterProps) {
   const currentValue = `${sortBy}-${sortOrder}`;
 
-  const handleSortChange = (value: string) => {
+  const handleSortChange = (value: string | null) => {
+    if (!value) return;
+    
     const [newSortBy, newSortOrder] = value.split("-") as [
       "score" | "uploadTime",
       "asc" | "desc"

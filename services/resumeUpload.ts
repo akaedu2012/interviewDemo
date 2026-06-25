@@ -17,7 +17,7 @@ export function validateFile(file: File): ValidationResult {
   const errors: string[] = [];
 
   // 验证文件类型
-  if (!FILE_UPLOAD.ALLOWED_TYPES.includes(file.type)) {
+  if (!FILE_UPLOAD.ALLOWED_TYPES.includes(file.type as any)) {
     errors.push(
       `文件格式不支持。仅支持 PDF 格式（当前格式：${file.type}）`
     );
