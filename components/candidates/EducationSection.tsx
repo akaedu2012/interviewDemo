@@ -14,37 +14,37 @@ interface EducationSectionProps {
 export function EducationSection({ education }: EducationSectionProps) {
   if (education.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>教育背景</CardTitle>
+      <Card className="glass-hover border border-cyan-500/20 ring-0">
+        <CardHeader className="px-6 pt-6 pb-4">
+          <CardTitle className="text-xl text-cyan-300">教育背景</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">暂无教育背景信息</p>
+        <CardContent className="px-6 pb-6">
+          <p className="text-sm text-slate-400">暂无教育背景信息</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>教育背景</CardTitle>
+    <Card className="glass-hover border border-cyan-500/20 ring-0">
+      <CardHeader className="px-6 pt-6 pb-4">
+        <CardTitle className="text-xl text-cyan-300">教育背景</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="px-6 pb-6">
+        <div className="space-y-5">
           {education.map((edu) => (
-            <div key={edu.id} className="flex gap-3 pb-4 border-b last:border-b-0 last:pb-0">
+            <div key={edu.id} className="flex gap-4 pb-5 border-b border-slate-700/50 last:border-b-0 last:pb-0">
               <div className="flex-shrink-0 mt-0.5">
-                <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">
-                  <GraduationCap className="size-4 text-primary" />
+                <div className="flex size-10 items-center justify-center rounded-lg bg-cyan-500/10">
+                  <GraduationCap className="size-5 text-cyan-400" />
                 </div>
               </div>
-              <div className="flex-1 space-y-1">
-                <h4 className="font-semibold text-sm">{edu.school}</h4>
-                <p className="text-sm text-muted-foreground">
+              <div className="flex-1 space-y-1.5">
+                <h4 className="font-semibold text-base text-slate-200">{edu.school}</h4>
+                <p className="text-sm text-slate-300">
                   {edu.degree} · {edu.major}
                 </p>
-                <p className="text-xs text-muted-foreground">{edu.graduationTime}</p>
+                <p className="text-xs text-slate-400">{edu.graduationTime}</p>
               </div>
             </div>
           ))}

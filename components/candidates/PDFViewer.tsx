@@ -29,35 +29,42 @@ export function PDFViewer({ filePath, fileName }: PDFViewerProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="glass-hover border border-cyan-500/20 ring-0">
+      <CardHeader className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileText className="size-5 text-primary" />
-            <CardTitle>简历文件</CardTitle>
+            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30">
+              <FileText className="size-5 text-blue-400" />
+            </div>
+            <CardTitle className="text-xl text-cyan-300">简历文件</CardTitle>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={handleDownload}
-            className="gap-2"
+            className="gap-2 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50 text-cyan-300"
           >
             <Download className="size-4" />
             下载
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">{fileName}</p>
+      <CardContent className="px-6 pb-6">
+        <div className="space-y-4">
+          <p className="text-xs text-slate-400">{fileName}</p>
           
           {loadError ? (
-            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/30">
-              <AlertCircle className="size-12 text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground text-center mb-3">
+            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-cyan-500/20 rounded-lg bg-slate-800/30">
+              <AlertCircle className="size-12 text-slate-400 mb-3" />
+              <p className="text-sm text-slate-300 text-center mb-3">
                 PDF 预览加载失败
               </p>
-              <Button variant="outline" size="sm" onClick={handleDownload}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDownload}
+                className="border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50 text-cyan-300"
+              >
                 <Download className="size-4 mr-2" />
                 下载查看
               </Button>
@@ -65,7 +72,7 @@ export function PDFViewer({ filePath, fileName }: PDFViewerProps) {
           ) : (
             <iframe
               src={filePath}
-              className="w-full h-[600px] border rounded-lg"
+              className="w-full h-[600px] border border-cyan-500/20 rounded-lg bg-slate-900/50"
               title="PDF Preview"
               onError={() => setLoadError(true)}
             />

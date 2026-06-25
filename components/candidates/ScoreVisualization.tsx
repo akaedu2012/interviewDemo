@@ -86,51 +86,52 @@ export function ScoreVisualization({ matchScore }: ScoreVisualizationProps) {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>匹配评分</CardTitle>
+    <Card className="glass-hover border border-cyan-500/20 ring-0">
+      <CardHeader className="px-6 pt-6 pb-4">
+        <CardTitle className="text-xl text-cyan-300">匹配评分</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-6 pb-6">
         <div className="space-y-6">
           {/* 总分显示 */}
-          <div className="text-center p-4 rounded-lg bg-muted/50">
-            <p className="text-sm text-muted-foreground mb-1">综合匹配度</p>
+          <div className="text-center p-6 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20">
+            <p className="text-sm text-slate-400 mb-2">综合匹配度</p>
             <p
-              className="text-4xl font-bold"
+              className="text-5xl font-bold"
               style={{ color: getScoreColor(matchScore.overallScore) }}
             >
               {matchScore.overallScore.toFixed(1)}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">满分 100</p>
+            <p className="text-xs text-slate-500 mt-2">满分 100</p>
           </div>
 
           {/* 雷达图 */}
           <div>
-            <h4 className="text-sm font-medium mb-3">多维度评分雷达图</h4>
+            <h4 className="text-base font-medium mb-4 text-slate-200">多维度评分雷达图</h4>
             <ResponsiveContainer width="100%" height={250}>
               <RadarChart data={radarData}>
-                <PolarGrid stroke="hsl(var(--border))" />
+                <PolarGrid stroke="rgba(148, 163, 184, 0.2)" />
                 <PolarAngleAxis
                   dataKey="dimension"
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                  tick={{ fill: "rgb(148, 163, 184)", fontSize: 12 }}
                 />
                 <PolarRadiusAxis
                   angle={90}
                   domain={[0, 100]}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                  tick={{ fill: "rgb(148, 163, 184)", fontSize: 10 }}
                 />
                 <Radar
                   name="得分"
                   dataKey="score"
-                  stroke="hsl(var(--primary))"
-                  fill="hsl(var(--primary))"
+                  stroke="rgb(6, 182, 212)"
+                  fill="rgb(6, 182, 212)"
                   fillOpacity={0.6}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "hsl(var(--popover))",
-                    border: "1px solid hsl(var(--border))",
+                    backgroundColor: "rgb(15, 23, 42)",
+                    border: "1px solid rgba(6, 182, 212, 0.3)",
                     borderRadius: "8px",
+                    color: "rgb(248, 250, 252)",
                   }}
                 />
               </RadarChart>
@@ -139,23 +140,24 @@ export function ScoreVisualization({ matchScore }: ScoreVisualizationProps) {
 
           {/* 柱状图 */}
           <div>
-            <h4 className="text-sm font-medium mb-3">各维度分数对比</h4>
+            <h4 className="text-base font-medium mb-4 text-slate-200">各维度分数对比</h4>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={barData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.2)" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                  tick={{ fill: "rgb(148, 163, 184)", fontSize: 12 }}
                 />
                 <YAxis
                   domain={[0, 100]}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                  tick={{ fill: "rgb(148, 163, 184)", fontSize: 10 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "hsl(var(--popover))",
-                    border: "1px solid hsl(var(--border))",
+                    backgroundColor: "rgb(15, 23, 42)",
+                    border: "1px solid rgba(6, 182, 212, 0.3)",
                     borderRadius: "8px",
+                    color: "rgb(248, 250, 252)",
                   }}
                   formatter={(value: any) => [`${Number(value).toFixed(1)}`, "分数"]}
                 />
@@ -169,27 +171,27 @@ export function ScoreVisualization({ matchScore }: ScoreVisualizationProps) {
           </div>
 
           {/* 分数图例 */}
-          <div className="flex items-center justify-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-center gap-6 text-sm pt-2">
+            <div className="flex items-center gap-2">
               <div
                 className="size-3 rounded-full"
                 style={{ backgroundColor: "hsl(142, 76%, 36%)" }}
               />
-              <span className="text-muted-foreground">优秀 (≥80)</span>
+              <span className="text-slate-400">优秀 (≥80)</span>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <div
                 className="size-3 rounded-full"
                 style={{ backgroundColor: "hsl(45, 93%, 47%)" }}
               />
-              <span className="text-muted-foreground">良好 (60-80)</span>
+              <span className="text-slate-400">良好 (60-80)</span>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <div
                 className="size-3 rounded-full"
                 style={{ backgroundColor: "hsl(var(--destructive))" }}
               />
-              <span className="text-muted-foreground">待提升 (&lt;60)</span>
+              <span className="text-slate-400">待提升 (&lt;60)</span>
             </div>
           </div>
         </div>

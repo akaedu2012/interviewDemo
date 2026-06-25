@@ -13,41 +13,49 @@ interface BasicInfoSectionProps {
  */
 export function BasicInfoSection({ candidate }: BasicInfoSectionProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>基本信息</CardTitle>
+    <Card className="glass-hover border border-cyan-500/20 ring-0">
+      <CardHeader className="px-6 pt-6 pb-4">
+        <CardTitle className="text-xl text-cyan-300">基本信息</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-3">
+      <CardContent className="px-6 pb-6">
+        <div className="grid gap-4">
           <div className="flex items-center gap-3">
-            <User className="size-4 text-muted-foreground" />
+            <div className="flex size-10 items-center justify-center rounded-lg bg-cyan-500/10">
+              <User className="size-5 text-cyan-400" />
+            </div>
             <div>
-              <p className="text-xs text-muted-foreground">姓名</p>
-              <p className="font-medium">{candidate.name || "未提供"}</p>
+              <p className="text-xs text-slate-400">姓名</p>
+              <p className="font-medium text-base text-slate-200">{candidate.name || "未提供"}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <Phone className="size-4 text-muted-foreground" />
+            <div className="flex size-10 items-center justify-center rounded-lg bg-blue-500/10">
+              <Phone className="size-5 text-blue-400" />
+            </div>
             <div>
-              <p className="text-xs text-muted-foreground">电话</p>
-              <p className="font-medium">{candidate.phone || "未提供"}</p>
+              <p className="text-xs text-slate-400">电话</p>
+              <p className="font-medium text-base text-slate-200">{candidate.phone || "未提供"}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <Mail className="size-4 text-muted-foreground" />
+            <div className="flex size-10 items-center justify-center rounded-lg bg-purple-500/10">
+              <Mail className="size-5 text-purple-400" />
+            </div>
             <div>
-              <p className="text-xs text-muted-foreground">邮箱</p>
-              <p className="font-medium">{candidate.email || "未提供"}</p>
+              <p className="text-xs text-slate-400">邮箱</p>
+              <p className="font-medium text-base text-slate-200">{candidate.email || "未提供"}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <MapPin className="size-4 text-muted-foreground" />
+            <div className="flex size-10 items-center justify-center rounded-lg bg-cyan-500/10">
+              <MapPin className="size-5 text-cyan-400" />
+            </div>
             <div>
-              <p className="text-xs text-muted-foreground">城市</p>
-              <p className="font-medium">{candidate.city || "未提供"}</p>
+              <p className="text-xs text-slate-400">城市</p>
+              <p className="font-medium text-base text-slate-200">{candidate.city || "未提供"}</p>
             </div>
           </div>
         </div>

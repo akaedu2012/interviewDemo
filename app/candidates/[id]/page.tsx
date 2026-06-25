@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { Notification } from "@/components/ui/Notification";
 import { BasicInfoSection } from "@/components/candidates/BasicInfoSection";
@@ -115,8 +116,11 @@ export default function CandidateDetailPage({
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-16rem)]">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-          <p className="text-sm text-muted-foreground">加载中...</p>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mx-auto" />
+            <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-xl animate-pulse" />
+          </div>
+          <p className="text-sm text-slate-400">加载候选人信息...</p>
         </div>
       </div>
     );
@@ -126,14 +130,19 @@ export default function CandidateDetailPage({
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-16rem)]">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold">候选人不存在</h1>
-          <p className="text-muted-foreground">{error}</p>
-          <Button onClick={() => router.push("/")} className="gap-2">
-            <ArrowLeft className="size-4" />
-            返回列表
-          </Button>
-        </div>
+        <Card className="glass-hover border border-red-500/30 ring-0 max-w-md">
+          <CardContent className="px-8 py-8 text-center space-y-4">
+            <h1 className="text-2xl font-bold text-red-400">候选人不存在</h1>
+            <p className="text-slate-400">{error}</p>
+            <Button 
+              onClick={() => router.push("/")} 
+              className="gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+            >
+              <ArrowLeft className="size-4" />
+              返回列表
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -152,16 +161,16 @@ export default function CandidateDetailPage({
             variant="ghost"
             size="sm"
             onClick={() => router.push("/")}
-            className="gap-2"
+            className="gap-2 hover:bg-cyan-500/10 hover:text-cyan-300"
           >
             <ArrowLeft className="size-4" />
             返回列表
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
               {candidate.name || "候选人详情"}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-slate-400">
               上传于 {new Date(candidate.createdAt).toLocaleString("zh-CN")}
             </p>
           </div>
@@ -169,7 +178,7 @@ export default function CandidateDetailPage({
         <Button
           onClick={triggerMatch}
           disabled={isMatching}
-          className="gap-2"
+          className="gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-lg shadow-cyan-500/20"
         >
           <RefreshCw className={`size-4 ${isMatching ? "animate-spin" : ""}`} />
           {isMatching ? "评分中..." : "重新评分"}
@@ -182,13 +191,15 @@ export default function CandidateDetailPage({
         <div className="lg:col-span-1 space-y-6">
           <BasicInfoSection candidate={candidate} />
           
-          <div className="p-4 border rounded-lg bg-card">
-            <StatusSelector
-              candidateId={candidate.id}
-              currentStatus={candidate.status}
-              onStatusChange={() => fetchCandidate()}
-            />
-          </div>
+          <Card className="glass-hover border border-cyan-500/20 ring-0">
+            <CardContent className="px-6 py-6">
+              <StatusSelector
+                candidateId={candidate.id}
+                currentStatus={candidate.status}
+                onStatusChange={() => fetchCandidate()}
+              />
+            </CardContent>
+          </Card>
 
           <SkillsSection skills={candidate.skills} />
         </div>
@@ -207,19 +218,21 @@ export default function CandidateDetailPage({
               <AICommentary commentary={candidate.matchScore.commentary} />
             </>
           ) : (
-            <div className="p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg text-center bg-muted/30">
-              <p className="text-sm text-muted-foreground mb-4">
-                暂无匹配评分
-              </p>
-              <Button
-                onClick={triggerMatch}
-                disabled={isMatching}
-                className="gap-2"
-              >
-                <RefreshCw className={`size-4 ${isMatching ? "animate-spin" : ""}`} />
-                开始评分
-              </Button>
-            </div>
+            <Card className="glass-hover border border-cyan-500/20 ring-0">
+              <CardContent className="px-6 py-8 text-center space-y-4">
+                <p className="text-sm text-slate-400">
+                  暂无匹配评分
+                </p>
+                <Button
+                  onClick={triggerMatch}
+                  disabled={isMatching}
+                  className="gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-lg shadow-cyan-500/20"
+                >
+                  <RefreshCw className={`size-4 ${isMatching ? "animate-spin" : ""}`} />
+                  开始评分
+                </Button>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

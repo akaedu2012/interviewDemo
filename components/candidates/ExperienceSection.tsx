@@ -14,38 +14,38 @@ interface ExperienceSectionProps {
 export function ExperienceSection({ experience }: ExperienceSectionProps) {
   if (experience.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>工作经历</CardTitle>
+      <Card className="glass-hover border border-cyan-500/20 ring-0">
+        <CardHeader className="px-6 pt-6 pb-4">
+          <CardTitle className="text-xl text-cyan-300">工作经历</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">暂无工作经历信息</p>
+        <CardContent className="px-6 pb-6">
+          <p className="text-sm text-slate-400">暂无工作经历信息</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>工作经历</CardTitle>
+    <Card className="glass-hover border border-cyan-500/20 ring-0">
+      <CardHeader className="px-6 pt-6 pb-4">
+        <CardTitle className="text-xl text-cyan-300">工作经历</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="px-6 pb-6">
+        <div className="space-y-5">
           {experience.map((exp) => (
-            <div key={exp.id} className="flex gap-3 pb-4 border-b last:border-b-0 last:pb-0">
+            <div key={exp.id} className="flex gap-4 pb-5 border-b border-slate-700/50 last:border-b-0 last:pb-0">
               <div className="flex-shrink-0 mt-0.5">
-                <div className="flex size-8 items-center justify-center rounded-full bg-secondary/50">
-                  <Briefcase className="size-4 text-secondary-foreground" />
+                <div className="flex size-10 items-center justify-center rounded-lg bg-blue-500/10">
+                  <Briefcase className="size-5 text-blue-400" />
                 </div>
               </div>
-              <div className="flex-1 space-y-1">
-                <h4 className="font-semibold text-sm">{exp.title}</h4>
-                <p className="text-sm text-muted-foreground">{exp.company}</p>
-                <p className="text-xs text-muted-foreground">
+              <div className="flex-1 space-y-1.5">
+                <h4 className="font-semibold text-base text-slate-200">{exp.title}</h4>
+                <p className="text-sm text-slate-300">{exp.company}</p>
+                <p className="text-xs text-slate-400">
                   {exp.startDate} - {exp.endDate}
                 </p>
-                <p className="text-sm mt-2 leading-relaxed whitespace-pre-wrap">
+                <p className="text-sm mt-2 leading-relaxed whitespace-pre-wrap text-slate-300">
                   {exp.responsibilities}
                 </p>
               </div>
