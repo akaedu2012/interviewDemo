@@ -1,0 +1,21 @@
+{
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "env": {
+    "DEEPSEEK_API_KEY": "@deepseek_api_key",
+    "DEEPSEEK_API_BASE_URL": "https://api.deepseek.com"
+  },
+  "build": {
+    "env": {
+      "DATABASE_URL": "file:/tmp/resume-analyzer.db"
+    }
+  },
+  "functions": {
+    "app/api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "regions": ["iad1"]
+}

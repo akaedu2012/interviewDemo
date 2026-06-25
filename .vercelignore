@@ -1,0 +1,24 @@
+# Vercel 部署时忽略的文件
+
+# 本地数据库文件
+data/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# 开发文件
+.env.local
+.env*.local
+
+# 测试和文档
+scripts/test-*.ts
+scripts/create-mock-*.ts
+*.md
+!README.md
+
+# 临时文件
+.DS_Store
+.idea/
+.vscode/
+*.log
