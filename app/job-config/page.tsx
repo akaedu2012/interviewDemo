@@ -157,7 +157,7 @@ export default function JobConfigPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="glass-hover border-cyan-500/20">
+        <Card className="glass-hover border border-cyan-500/20 ring-0">
           <CardHeader className="pb-6">
             <div className="flex items-center space-x-2">
               <div className="h-6 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full" />
