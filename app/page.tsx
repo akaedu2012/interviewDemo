@@ -29,9 +29,11 @@ export default function Home() {
   const sortBy = (searchParams.get("sortBy") || "uploadTime") as "score" | "uploadTime";
   const sortOrder = (searchParams.get("sortOrder") || "desc") as "asc" | "desc";
   const searchKeyword = searchParams.get("search") || "";
-  const selectedSkills = searchParams.get("skills")
-    ? searchParams.get("skills")!.split(",").filter(Boolean)
-    : [];
+  const selectedSkillsString = searchParams.get("skills") || "";
+  const selectedSkills = React.useMemo(
+    () => selectedSkillsString ? selectedSkillsString.split(",").filter(Boolean) : [],
+    [selectedSkillsString]
+  );
   const viewMode = (searchParams.get("view") || "table") as ViewMode;
 
   // 更新 URL 参数
@@ -69,8 +71,8 @@ export default function Home() {
         params.set("search", searchKeyword);
       }
 
-      if (selectedSkills.length > 0) {
-        params.set("skills", selectedSkills.join(","));
+      if (selectedSkillsString) {
+        params.set("skills", selectedSkillsString);
       }
 
       const response = await fetch(`/api/candidates?${params.toString()}`);
@@ -107,7 +109,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, sortBy, sortOrder, searchKeyword, selectedSkills]);
+  }, [page, pageSize, sortBy, sortOrder, searchKeyword, selectedSkillsString]);
 
   // 初始加载和参数变化时重新获取数据
   React.useEffect(() => {
