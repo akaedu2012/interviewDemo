@@ -349,8 +349,8 @@ ${resumeText}`;
 }
 
 /**
- * 任务 4.6 - 流式提取所有信息
- * 按阶段依次提取简历的所有信息，支持 SSE 流式传输
+ * 任务 4.6 - 流式提取所有信息（优化版）
+ * 使用并行提取加快速度，同时保持 SSE 流式传输
  * 
  * @param resumeText - 简历文本内容
  * @yields 每个提取阶段的进度信息
@@ -359,25 +359,30 @@ export async function* extractAll(
   resumeText: string
 ): AsyncGenerator<ExtractionProgress> {
   try {
-    // 阶段 1: 提取基本信息
-    console.log("开始提取基本信息...");
-    const basicInfo = await extractBasicInfo(resumeText);
+    console.log("开始并行提取所有信息...");
+    
+    // 立即发送开始提取的进度
     yield {
       stage: "basic",
-      data: { basicInfo },
+      data: { basicInfo: null },
     };
 
-    // 阶段 2: 提取教育背景
-    console.log("开始提取教育背景...");
-    const education = await extractEducation(resumeText);
+    // 并行提取所有信息以加快速度（关键优化！）
+    const [basicInfo, education, experience, skills] = await Promise.all([
+      extractBasicInfo(resumeText),
+      extractEducation(resumeText),
+      extractExperience(resumeText),
+      extractSkills(resumeText),
+    ]);
+
+    console.log("所有信息提取完成");
+
+    // 分阶段返回进度（模拟流式，实际上数据已全部提取）
     yield {
       stage: "education",
       data: { basicInfo, education: education as Education[] },
     };
 
-    // 阶段 3: 提取工作经历
-    console.log("开始提取工作经历...");
-    const experience = await extractExperience(resumeText);
     yield {
       stage: "experience",
       data: {
@@ -387,9 +392,6 @@ export async function* extractAll(
       },
     };
 
-    // 阶段 4: 提取技能标签
-    console.log("开始提取技能标签...");
-    const skills = await extractSkills(resumeText);
     yield {
       stage: "skills",
       data: {
@@ -401,7 +403,6 @@ export async function* extractAll(
     };
 
     // 阶段 5: 提取完成
-    console.log("所有信息提取完成");
     yield {
       stage: "complete",
       data: {

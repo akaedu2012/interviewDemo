@@ -26,8 +26,8 @@ import { promises as fs } from "fs";
 // 配置路由为动态和 Node.js runtime（SSE 需要）
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-// Vercel 函数超时设置（最大 60 秒）
-export const maxDuration = 60;
+// Vercel 免费账户最大 10 秒
+export const maxDuration = 10;
 
 /**
  * GET 处理器 - 流式返回 AI 提取进度

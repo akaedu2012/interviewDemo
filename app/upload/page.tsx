@@ -383,15 +383,14 @@ export default function UploadPage() {
             })
           );
 
-          // 为每个成功上传的文件使用简化 API 进行提取（不使用 SSE）
+          // 为每个成功上传的文件建立 SSE 连接
           uploads.forEach((upload: any) => {
             if (upload.status === 'uploaded' && upload.fileId) {
               const fileItem = newFileItems.find(
                 (item) => item.file.name === upload.fileName
               );
               if (fileItem) {
-                // 使用简化 API 而不是 SSE
-                extractWithSimpleAPI(fileItem.id, upload.fileId);
+                connectExtractionSSE(fileItem.id, upload.fileId);
               }
             }
           });
@@ -436,7 +435,7 @@ export default function UploadPage() {
         setIsUploading(false);
       }
     },
-    [isUploading, uploadFilesToServer, extractWithSimpleAPI]
+    [isUploading, uploadFilesToServer, connectExtractionSSE]
   );
 
   /**
