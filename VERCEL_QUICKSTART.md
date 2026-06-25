@@ -60,9 +60,11 @@ DEEPSEEK_API_BASE_URL = https://api.deepseek.com
 - 🎨 享受科技感 UI
 
 ### ⚠️ 重要提醒
+
 - **数据不持久化**: SQLite 在 `/tmp` 目录，冷启动后数据会丢失
-- **仅供演示**: 不适合生产环境存储真实数据
 - **冷启动**: 长时间无访问后首次打开需要 5-10 秒
+- **仅供演示**: 不适合生产环境存储真实数据
+- **减少冷启动**: 推荐使用 [UptimeRobot](https://uptimerobot.com)（免费）每5分钟自动访问，详见 [VERCEL_CRON_GUIDE.md](./VERCEL_CRON_GUIDE.md)
 
 ---
 

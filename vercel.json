@@ -32,11 +32,5 @@
       "source": "/(.*)",
       "destination": "/"
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/health",
-      "schedule": "*/10 * * * *"
-    }
   ]
 }
