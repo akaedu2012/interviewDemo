@@ -24,14 +24,16 @@ export class ApiError extends Error {
 export function errorResponse(error: unknown, defaultMessage = "请求处理失败"): NextResponse {
   console.error("[API Error]", error);
 
-  if (error instanceof ApiError) {
+  // 检查是否是 ApiError 实例
+  if (error && typeof error === 'object' && 'status' in error && 'code' in error) {
+    const apiError = error as ApiError;
     return NextResponse.json(
       {
-        error: error.message,
-        code: error.code,
-        details: error.details,
+        error: apiError.message,
+        code: apiError.code,
+        details: apiError.details,
       },
-      { status: error.status || 500 }
+      { status: apiError.status || 500 }
     );
   }
 
