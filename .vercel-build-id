@@ -1,0 +1,3 @@
+e34ef9e4dccb497d6a755a520e867225c96605a2
+Build Time: 2026-06-25 16:44:58
+Fixed: Database table names (jobDescriptions instead of jobs, removed resumes)
