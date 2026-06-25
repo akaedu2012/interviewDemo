@@ -56,3 +56,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Markdown files (except readMe.md)
+*.md
+!readMe.md
