@@ -9,7 +9,7 @@ const { execSync } = require('child_process');
 // 配置
 const CONFIG = {
   // 要删除的部署状态
-  deleteStatuses: ['ERROR', 'CANCELED'],
+  deleteStatuses: ['ERROR', 'QUEUED', 'CANCELED'],
   
   // 是否删除旧的成功部署（保留最近N个）
   deleteOldSuccess: false,
