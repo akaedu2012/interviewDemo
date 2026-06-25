@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FileDropzone, FileUploadList, FileUploadItem, UploadStatus } from '@/components/upload';
 import { Notification } from '@/components/ui/Notification';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Upload } from 'lucide-react';
 
 /**
  * UploadPage - 简历上传页面
