@@ -2,13 +2,11 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": ".next",
   "installCommand": "npm install",
-  "env": {
-    "DEEPSEEK_API_KEY": "@deepseek_api_key",
-    "DEEPSEEK_API_BASE_URL": "https://api.deepseek.com"
-  },
+  "framework": "nextjs",
   "build": {
     "env": {
-      "DATABASE_URL": "file:/tmp/resume-analyzer.db"
+      "DATABASE_URL": "file:/tmp/resume-analyzer.db",
+      "NEXT_TELEMETRY_DISABLED": "1"
     }
   },
   "functions": {
@@ -17,5 +15,28 @@
       "maxDuration": 10
     }
   },
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "*/10 * * * *"
+    }
+  ]
 }

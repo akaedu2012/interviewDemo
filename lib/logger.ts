@@ -1,243 +1,227 @@
 /**
- * 统一日志工具
- * 提供结构化日志记录，支持不同日志级别和环境配置
- * 任务 15.3: 添加日志和监控
+ * 结构化日志工具
  */
 
-/**
- * 日志级别
- */
 export enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
+  DEBUG = 'DEBUG',
+  INFO = 'INFO',
+  WARN = 'WARN',
+  ERROR = 'ERROR',
 }
 
-/**
- * 日志配置
- */
-interface LoggerConfig {
+interface LogContext {
+  timestamp: string;
   level: LogLevel;
-  enableConsole: boolean;
-  enableRemote: boolean;
-  remoteEndpoint?: string;
-}
-
-/**
- * 默认配置
- */
-const defaultConfig: LoggerConfig = {
-  level: process.env.NODE_ENV === "production" ? LogLevel.INFO : LogLevel.DEBUG,
-  enableConsole: true,
-  enableRemote: false,
-};
-
-/**
- * 当前配置
- */
-let config: LoggerConfig = { ...defaultConfig };
-
-/**
- * 配置日志器
- */
-export function configureLogger(newConfig: Partial<LoggerConfig>): void {
-  config = { ...config, ...newConfig };
-}
-
-/**
- * 日志元数据
- */
-interface LogMetadata {
-  [key: string]: any;
-}
-
-/**
- * 格式化时间戳
- */
-function formatTimestamp(): string {
-  return new Date().toISOString();
+  message: string;
+  context?: Record<string, unknown>;
+  error?: Error;
 }
 
 /**
  * 格式化日志消息
  */
-function formatLogMessage(
-  level: string,
-  message: string,
-  metadata?: LogMetadata
-): string {
-  const timestamp = formatTimestamp();
-  const metaStr = metadata ? ` ${JSON.stringify(metadata)}` : "";
-  return `[${timestamp}] [${level}] ${message}${metaStr}`;
+function formatLog(logContext: LogContext): string {
+  const { timestamp, level, message, context, error } = logContext;
+  
+  let log = `[${timestamp}] [${level}] ${message}`;
+  
+  if (context && Object.keys(context).length > 0) {
+    log += ` | ${JSON.stringify(context)}`;
+  }
+  
+  if (error) {
+    log += `\n  Error: ${error.message}`;
+    if (error.stack) {
+      log += `\n  Stack: ${error.stack}`;
+    }
+  }
+  
+  return log;
 }
 
 /**
- * 发送日志到远程服务器（可选）
+ * 日志记录器类
  */
-async function sendToRemote(
-  level: string,
-  message: string,
-  metadata?: LogMetadata
-): Promise<void> {
-  if (!config.enableRemote || !config.remoteEndpoint) {
-    return;
+class Logger {
+  private context: Record<string, unknown> = {};
+  
+  /**
+   * 设置全局上下文
+   */
+  setContext(context: Record<string, unknown>): void {
+    this.context = { ...this.context, ...context };
   }
-
-  try {
-    await fetch(config.remoteEndpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        timestamp: formatTimestamp(),
-        level,
-        message,
-        metadata,
-      }),
-    });
-  } catch (error) {
-    // 静默失败，不影响主流程
-    console.error("Failed to send log to remote:", error);
+  
+  /**
+   * 清除全局上下文
+   */
+  clearContext(): void {
+    this.context = {};
   }
-}
-
-/**
- * 通用日志函数
- */
-function log(
-  level: LogLevel,
-  levelName: string,
-  message: string,
-  metadata?: LogMetadata
-): void {
-  // 检查日志级别
-  if (level < config.level) {
-    return;
-  }
-
-  // 控制台输出
-  if (config.enableConsole) {
-    const formattedMessage = formatLogMessage(levelName, message, metadata);
+  
+  /**
+   * 记录日志
+   */
+  private log(
+    level: LogLevel,
+    message: string,
+    context?: Record<string, unknown>,
+    error?: Error
+  ): void {
+    const logContext: LogContext = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      context: { ...this.context, ...context },
+      error,
+    };
+    
+    const formattedLog = formatLog(logContext);
     
     switch (level) {
       case LogLevel.DEBUG:
-        console.debug(formattedMessage);
+        console.debug(formattedLog);
         break;
       case LogLevel.INFO:
-        console.info(formattedMessage);
+        console.info(formattedLog);
         break;
       case LogLevel.WARN:
-        console.warn(formattedMessage);
+        console.warn(formattedLog);
         break;
       case LogLevel.ERROR:
-        console.error(formattedMessage);
+        console.error(formattedLog);
         break;
     }
   }
-
-  // 远程日志（异步，不阻塞）
-  if (config.enableRemote) {
-    sendToRemote(levelName, message, metadata).catch(() => {
-      // 忽略错误
-    });
-  }
-}
-
-/**
- * Logger 类
- */
-export class Logger {
-  private context: string;
-
-  constructor(context: string) {
-    this.context = context;
-  }
-
+  
   /**
-   * DEBUG 级别日志
+   * Debug 日志
    */
-  debug(message: string, metadata?: LogMetadata): void {
-    log(LogLevel.DEBUG, "DEBUG", `[${this.context}] ${message}`, metadata);
-  }
-
-  /**
-   * INFO 级别日志
-   */
-  info(message: string, metadata?: LogMetadata): void {
-    log(LogLevel.INFO, "INFO", `[${this.context}] ${message}`, metadata);
-  }
-
-  /**
-   * WARN 级别日志
-   */
-  warn(message: string, metadata?: LogMetadata): void {
-    log(LogLevel.WARN, "WARN", `[${this.context}] ${message}`, metadata);
-  }
-
-  /**
-   * ERROR 级别日志
-   */
-  error(message: string, error?: Error | any, metadata?: LogMetadata): void {
-    const errorMetadata: LogMetadata = {
-      ...metadata,
-      error: error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      } : error,
-    };
-
-    log(LogLevel.ERROR, "ERROR", `[${this.context}] ${message}`, errorMetadata);
-  }
-
-  /**
-   * 记录 API 请求
-   */
-  logApiRequest(
-    method: string,
-    path: string,
-    statusCode: number,
-    duration: number,
-    metadata?: LogMetadata
-  ): void {
-    const requestMetadata: LogMetadata = {
-      method,
-      path,
-      statusCode,
-      duration: `${duration}ms`,
-      ...metadata,
-    };
-
-    if (statusCode >= 500) {
-      this.error(`API Request Failed: ${method} ${path}`, null, requestMetadata);
-    } else if (statusCode >= 400) {
-      this.warn(`API Request Error: ${method} ${path}`, requestMetadata);
-    } else {
-      this.info(`API Request: ${method} ${path}`, requestMetadata);
+  debug(message: string, context?: Record<string, unknown>): void {
+    if (process.env.NODE_ENV === 'development') {
+      this.log(LogLevel.DEBUG, message, context);
     }
   }
-
+  
   /**
-   * 记录性能指标
+   * Info 日志
    */
-  logPerformance(operation: string, duration: number, metadata?: LogMetadata): void {
-    this.info(`Performance: ${operation}`, {
+  info(message: string, context?: Record<string, unknown>): void {
+    this.log(LogLevel.INFO, message, context);
+  }
+  
+  /**
+   * Warning 日志
+   */
+  warn(message: string, context?: Record<string, unknown>): void {
+    this.log(LogLevel.WARN, message, context);
+  }
+  
+  /**
+   * Error 日志
+   */
+  error(message: string, error?: Error, context?: Record<string, unknown>): void {
+    this.log(LogLevel.ERROR, message, context, error);
+  }
+  
+  /**
+   * API 请求日志
+   */
+  apiRequest(method: string, path: string, context?: Record<string, unknown>): void {
+    this.info(`API Request: ${method} ${path}`, context);
+  }
+  
+  /**
+   * API 响应日志
+   */
+  apiResponse(
+    method: string,
+    path: string,
+    status: number,
+    duration: number,
+    context?: Record<string, unknown>
+  ): void {
+    this.info(`API Response: ${method} ${path} - ${status}`, {
+      ...context,
       duration: `${duration}ms`,
-      ...metadata,
     });
+  }
+  
+  /**
+   * 数据库操作日志
+   */
+  dbOperation(operation: string, context?: Record<string, unknown>): void {
+    this.debug(`DB Operation: ${operation}`, context);
+  }
+  
+  /**
+   * 外部服务调用日志
+   */
+  externalService(service: string, operation: string, context?: Record<string, unknown>): void {
+    this.info(`External Service: ${service} - ${operation}`, context);
+  }
+}
+
+// 导出单例实例
+export const logger = new Logger();
+
+/**
+ * API 请求计时器
+ */
+export class ApiTimer {
+  private startTime: number;
+  
+  constructor(
+    private method: string,
+    private path: string
+  ) {
+    this.startTime = Date.now();
+    logger.apiRequest(method, path);
+  }
+  
+  /**
+   * 结束计时并记录响应
+   */
+  end(status: number, context?: Record<string, unknown>): void {
+    const duration = Date.now() - this.startTime;
+    logger.apiResponse(this.method, this.path, status, duration, context);
   }
 }
 
 /**
- * 创建 Logger 实例
+ * 性能监控装饰器
  */
-export function createLogger(context: string): Logger {
-  return new Logger(context);
+export function measurePerformance(target: string) {
+  return function (
+    _target: unknown,
+    _propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalMethod = descriptor.value;
+    
+    descriptor.value = async function (...args: unknown[]) {
+      const startTime = Date.now();
+      
+      try {
+        const result = await originalMethod.apply(this, args);
+        const duration = Date.now() - startTime;
+        
+        logger.debug(`Performance: ${target}`, { duration: `${duration}ms` });
+        
+        return result;
+      } catch (error) {
+        const duration = Date.now() - startTime;
+        
+        logger.error(
+          `Performance: ${target} (failed)`,
+          error instanceof Error ? error : undefined,
+          { duration: `${duration}ms` }
+        );
+        
+        throw error;
+      }
+    };
+    
+    return descriptor;
+  };
 }
-
-/**
- * 默认 Logger 实例
- */
-export const logger = new Logger("App");
