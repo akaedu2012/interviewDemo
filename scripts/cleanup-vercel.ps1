@@ -40,55 +40,64 @@ $errorCount = 0
 $queuedCount = 0
 $canceledCount = 0
 
-$deployments | ForEach-Object {
-    $line = $_.ToString()
+foreach ($line in $deployments) {
+    $lineStr = $line.ToString()
     
-    # 查找包含 ERROR 的行
-    if ($line -match "Error.*?(https://[^\s]+)") {
-        $url = $matches[1]
-        $errorCount++
-        
-        Write-Host "🗑️  删除 [ERROR]: $url" -ForegroundColor Red
-        
-        try {
-            vercel rm $url --yes 2>&1 | Out-Null
-            Write-Host "   ✅ 已删除" -ForegroundColor Green
-            $deleted++
-        } catch {
-            Write-Host "   ❌ 删除失败" -ForegroundColor Red
-            $failed++
+    # 查找包含 Error 的行
+    if ($lineStr -like "*Error*" -and $lineStr -like "*https://*") {
+        # 提取 URL
+        if ($lineStr -match "(https://[^\s]+)") {
+            $url = $matches[1]
+            $errorCount++
+            
+            Write-Host "🗑️  删除 [ERROR]: $url" -ForegroundColor Red
+            
+            try {
+                vercel rm $url --yes 2>&1 | Out-Null
+                Write-Host "   ✅ 已删除" -ForegroundColor Green
+                $deleted++
+            } catch {
+                Write-Host "   ❌ 删除失败" -ForegroundColor Red
+                $failed++
+            }
         }
     }
     # 查找包含 Queued 的行
-    elseif ($line -match "Queued.*?(https://[^\s]+)") {
-        $url = $matches[1]
-        $queuedCount++
-        
-        Write-Host "🗑️  删除 [QUEUED]: $url" -ForegroundColor Yellow
-        
-        try {
-            vercel rm $url --yes 2>&1 | Out-Null
-            Write-Host "   ✅ 已删除" -ForegroundColor Green
-            $deleted++
-        } catch {
-            Write-Host "   ❌ 删除失败" -ForegroundColor Red
-            $failed++
+    elseif ($lineStr -like "*Queued*" -and $lineStr -like "*https://*") {
+        # 提取 URL
+        if ($lineStr -match "(https://[^\s]+)") {
+            $url = $matches[1]
+            $queuedCount++
+            
+            Write-Host "🗑️  删除 [QUEUED]: $url" -ForegroundColor Yellow
+            
+            try {
+                vercel rm $url --yes 2>&1 | Out-Null
+                Write-Host "   ✅ 已删除" -ForegroundColor Green
+                $deleted++
+            } catch {
+                Write-Host "   ❌ 删除失败" -ForegroundColor Red
+                $failed++
+            }
         }
     }
     # 查找包含 Canceled 的行
-    elseif ($line -match "Canceled.*?(https://[^\s]+)") {
-        $url = $matches[1]
-        $canceledCount++
-        
-        Write-Host "🗑️  删除 [CANCELED]: $url" -ForegroundColor Gray
-        
-        try {
-            vercel rm $url --yes 2>&1 | Out-Null
-            Write-Host "   ✅ 已删除" -ForegroundColor Green
-            $deleted++
-        } catch {
-            Write-Host "   ❌ 删除失败" -ForegroundColor Red
-            $failed++
+    elseif ($lineStr -like "*Canceled*" -and $lineStr -like "*https://*") {
+        # 提取 URL
+        if ($lineStr -match "(https://[^\s]+)") {
+            $url = $matches[1]
+            $canceledCount++
+            
+            Write-Host "🗑️  删除 [CANCELED]: $url" -ForegroundColor Gray
+            
+            try {
+                vercel rm $url --yes 2>&1 | Out-Null
+                Write-Host "   ✅ 已删除" -ForegroundColor Green
+                $deleted++
+            } catch {
+                Write-Host "   ❌ 删除失败" -ForegroundColor Red
+                $failed++
+            }
         }
     }
 }
