@@ -55,15 +55,20 @@ export function validateFile(file: File): ValidationResult {
 
 /**
  * 存储文件到文件系统
- * 保存到 public/uploads 目录并返回文件路径
+ * 在 Vercel 环境使用 /tmp 目录，本地使用 public/uploads 目录
  */
 export async function storeFile(
   file: File,
   fileId: string
 ): Promise<string> {
   try {
-    // 确保上传目录存在
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    // 根据环境选择上传目录
+    // Vercel 环境：使用 /tmp（唯一可写的目录）
+    // 本地环境：使用 public/uploads
+    const isVercel = process.env.VERCEL === '1';
+    const uploadDir = isVercel 
+      ? path.join('/tmp', 'uploads')
+      : path.join(process.cwd(), "public", "uploads");
     
     try {
       await fs.access(uploadDir);
@@ -87,10 +92,11 @@ export async function storeFile(
     await fs.writeFile(filePath, buffer);
 
     // 返回相对路径（用于数据库存储和访问）
-    return `/uploads/${fileName}`;
+    // 注意：Vercel 环境中 /tmp 文件在冷启动后会丢失
+    return isVercel ? `/tmp/uploads/${fileName}` : `/uploads/${fileName}`;
   } catch (error) {
     console.error("Failed to store file:", error);
-    throw new Error("文件存储失败");
+    throw new Error(`文件存储失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 }
 
@@ -170,7 +176,12 @@ export async function uploadResumes(
  */
 export async function deleteFile(filePath: string): Promise<void> {
   try {
-    const fullPath = path.join(process.cwd(), "public", filePath);
+    // 根据文件路径判断是 Vercel 环境还是本地环境
+    const isVercelPath = filePath.startsWith('/tmp/');
+    const fullPath = isVercelPath 
+      ? filePath  // Vercel: 使用绝对路径
+      : path.join(process.cwd(), "public", filePath);  // 本地: 相对路径
+    
     await fs.unlink(fullPath);
   } catch (error) {
     console.error("Failed to delete file:", error);

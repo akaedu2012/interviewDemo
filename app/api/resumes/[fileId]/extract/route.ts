@@ -59,8 +59,14 @@ export async function GET(
         };
 
         // 步骤 1: 构建文件路径并验证文件存在
-        const filePath = `/uploads/${fileId}.pdf`;
-        const fullPath = path.join(process.cwd(), "public", filePath);
+        // 根据环境选择文件路径
+        const isVercel = process.env.VERCEL === '1';
+        const filePath = isVercel 
+          ? `/tmp/uploads/${fileId}.pdf`
+          : `/uploads/${fileId}.pdf`;
+        const fullPath = isVercel
+          ? path.join('/tmp', 'uploads', `${fileId}.pdf`)
+          : path.join(process.cwd(), "public", filePath);
 
         // 检查文件是否存在
         try {
@@ -79,9 +85,9 @@ export async function GET(
         const fileName = `${fileId}.pdf`;
         const fileSize = fileStats.size;
 
-        // 步骤 2: 调用 PDF Parser 提取文本
-        console.log(`[Extract API] 开始解析 PDF 文件: ${filePath}`);
-        const parseResult = await parseResume(filePath);
+        // 步骤 2: 调用 PDF Parser 提取文本（传入完整路径）
+        console.log(`[Extract API] 开始解析 PDF 文件: ${fullPath}`);
+        const parseResult = await parseResume(fullPath);
 
         if (!parseResult.success || !parseResult.text) {
           sendEvent("error", {
