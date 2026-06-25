@@ -88,25 +88,30 @@ export function CandidateList({
               sortOrder={sortOrder}
               onSortChange={onSortChange}
             />
-            <p className="text-sm text-muted-foreground">
-              共 <span className="font-medium text-foreground">{total}</span> 位候选人
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+              <span className="text-sm text-slate-400">共</span>
+              <span className="text-lg font-bold text-cyan-400">{total}</span>
+              <span className="text-sm text-slate-400">位候选人</span>
               {total > 0 && (
                 <>
-                  ，显示 <span className="font-medium text-foreground">{startIndex}</span> -{" "}
-                  <span className="font-medium text-foreground">{endIndex}</span>
+                  <span className="text-slate-600 mx-1">|</span>
+                  <span className="text-sm text-slate-400">显示</span>
+                  <span className="text-sm font-medium text-cyan-300">{startIndex}-{endIndex}</span>
                 </>
               )}
-            </p>
+            </div>
           </div>
 
           {/* 视图切换 */}
-          <div className="flex items-center gap-1 border rounded-md p-1">
+          <div className="flex items-center gap-1 border border-cyan-500/20 rounded-lg p-1 bg-slate-800/30">
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0",
-                viewMode === "table" && "bg-muted"
+                "h-8 w-8 p-0 transition-all",
+                viewMode === "table" 
+                  ? "bg-cyan-600 text-white hover:bg-cyan-700" 
+                  : "text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10"
               )}
               onClick={() => onViewModeChange("table")}
               aria-label="表格视图"
@@ -117,8 +122,10 @@ export function CandidateList({
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 w-8 p-0",
-                viewMode === "card" && "bg-muted"
+                "h-8 w-8 p-0 transition-all",
+                viewMode === "card" 
+                  ? "bg-cyan-600 text-white hover:bg-cyan-700" 
+                  : "text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10"
               )}
               onClick={() => onViewModeChange("card")}
               aria-label="卡片视图"
@@ -153,54 +160,101 @@ export function CandidateList({
 
       {/* 分页控件 */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page - 1)}
-            disabled={page === 1}
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            上一页
-          </Button>
-          
-          <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-              let pageNumber: number;
+        <div className="glass-hover rounded-xl p-4 border border-cyan-500/20">
+          <div className="flex items-center justify-between">
+            {/* 页码信息 */}
+            <div className="text-sm text-slate-400">
+              第 <span className="text-cyan-300 font-medium">{page}</span> / <span className="text-slate-300 font-medium">{totalPages}</span> 页
+              <span className="mx-2">·</span>
+              共 <span className="text-cyan-300 font-medium">{total}</span> 条记录
+            </div>
+
+            {/* 分页按钮组 */}
+            <div className="flex items-center gap-2">
+              {/* 上一页按钮 */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(page - 1)}
+                disabled={page === 1}
+                className="border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                上一页
+              </Button>
               
-              if (totalPages <= 7) {
-                pageNumber = i + 1;
-              } else if (page <= 4) {
-                pageNumber = i + 1;
-              } else if (page >= totalPages - 3) {
-                pageNumber = totalPages - 6 + i;
-              } else {
-                pageNumber = page - 3 + i;
-              }
+              {/* 页码按钮 */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  let pageNumber: number;
+                  
+                  if (totalPages <= 7) {
+                    pageNumber = i + 1;
+                  } else if (page <= 4) {
+                    pageNumber = i + 1;
+                  } else if (page >= totalPages - 3) {
+                    pageNumber = totalPages - 6 + i;
+                  } else {
+                    pageNumber = page - 3 + i;
+                  }
 
-              return (
-                <Button
-                  key={pageNumber}
-                  variant={page === pageNumber ? "default" : "outline"}
-                  size="sm"
-                  className="w-9"
-                  onClick={() => onPageChange(pageNumber)}
-                >
-                  {pageNumber}
-                </Button>
-              );
-            })}
+                  const isCurrentPage = page === pageNumber;
+
+                  return (
+                    <Button
+                      key={pageNumber}
+                      variant={isCurrentPage ? "default" : "outline"}
+                      size="sm"
+                      className={cn(
+                        "min-w-[36px] h-9",
+                        isCurrentPage
+                          ? "bg-cyan-600 text-white border-cyan-500/50 hover:bg-cyan-700 font-medium shadow-lg shadow-cyan-500/30"
+                          : "border-cyan-500/20 text-slate-300 hover:bg-cyan-500/10 hover:border-cyan-500/50 hover:text-cyan-300"
+                      )}
+                      onClick={() => onPageChange(pageNumber)}
+                    >
+                      {pageNumber}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              {/* 下一页按钮 */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(page + 1)}
+                disabled={page === totalPages}
+                className="border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                下一页
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+
+            {/* 快速跳转（可选） */}
+            <div className="flex items-center gap-2 text-sm text-slate-400">
+              <span>跳转至</span>
+              <input
+                type="number"
+                min="1"
+                max={totalPages}
+                placeholder={String(page)}
+                className="w-16 h-8 px-2 rounded-md border border-cyan-500/30 bg-slate-800/50 text-slate-200 text-center focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const target = e.target as HTMLInputElement;
+                    const newPage = parseInt(target.value, 10);
+                    if (newPage >= 1 && newPage <= totalPages) {
+                      onPageChange(newPage);
+                      target.value = "";
+                    }
+                  }
+                }}
+              />
+              <span>页</span>
+            </div>
           </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page + 1)}
-            disabled={page === totalPages}
-          >
-            下一页
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
         </div>
       )}
     </div>
