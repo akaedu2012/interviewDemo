@@ -361,12 +361,6 @@ export async function* extractAll(
   try {
     console.log("开始并行提取所有信息...");
     
-    // 立即发送开始提取的进度
-    yield {
-      stage: "basic",
-      data: { basicInfo: null },
-    };
-
     // 并行提取所有信息以加快速度（关键优化！）
     const [basicInfo, education, experience, skills] = await Promise.all([
       extractBasicInfo(resumeText),
@@ -377,7 +371,12 @@ export async function* extractAll(
 
     console.log("所有信息提取完成");
 
-    // 分阶段返回进度（模拟流式，实际上数据已全部提取）
+    // 分阶段返回进度（快速发送所有进度事件）
+    yield {
+      stage: "basic",
+      data: { basicInfo },
+    };
+
     yield {
       stage: "education",
       data: { basicInfo, education: education as Education[] },
