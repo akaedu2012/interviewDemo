@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CandidateList, ViewMode } from "@/components/candidates";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -12,7 +13,7 @@ import type { CandidateTableItem } from "@/components/candidates/CandidateTable"
 /**
  * 主页 - 候选人列表页面
  */
-export default function Home() {
+function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -248,5 +249,23 @@ export default function Home() {
         />
       )}
     </div>
+  );
+}
+
+/**
+ * 导出的主页组件，包裹了 Suspense 边界
+ */
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center py-20">
+        <div className="relative">
+          <div className="absolute inset-0 bg-cyan-500/20 blur-2xl animate-pulse" />
+          <LoadingSpinner size="lg" text="加载中..." />
+        </div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 }

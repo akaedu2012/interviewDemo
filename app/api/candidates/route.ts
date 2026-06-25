@@ -3,6 +3,9 @@ import { z } from "zod";
 import { listCandidates } from "@/services/candidateManager";
 import type { ApiResponse, PaginatedResult, Candidate } from "@/types";
 
+// 标记此路由为动态路由
+export const dynamic = 'force-dynamic';
+
 /**
  * 查询参数验证 Schema
  */
