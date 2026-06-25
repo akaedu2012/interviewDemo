@@ -3,6 +3,11 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
   "build": {
     "env": {
       "DATABASE_URL": "file:/tmp/resume-analyzer.db",
