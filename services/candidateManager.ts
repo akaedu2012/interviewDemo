@@ -1,6 +1,6 @@
 import { db, candidates, education, experience, skills, matchScores } from "@/db";
 import { eq, and, desc, asc, like, inArray, or, sql } from "drizzle-orm";
-import { generateId, safeJsonParse } from "@/lib/utils";
+import { generateId } from "@/lib/utils";
 import type {
   Candidate,
   Education,
