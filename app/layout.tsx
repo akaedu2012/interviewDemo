@@ -3,6 +3,8 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout/Layout";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -19,7 +21,10 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className={cn("font-sans", inter.variable)}>
       <body className="antialiased">
-        <Layout>{children}</Layout>
+        <ErrorBoundary>
+          <Layout>{children}</Layout>
+          <Toaster />
+        </ErrorBoundary>
       </body>
     </html>
   );
