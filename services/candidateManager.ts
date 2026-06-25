@@ -59,64 +59,62 @@ export async function createCandidate(
   const now = new Date().toISOString();
 
   try {
-    // 开始事务 (better-sqlite3 的事务是同步的)
-    db.transaction((tx) => {
-      // 插入候选人基本信息
-      tx.insert(candidates).values({
-        id: candidateId,
-        name: data.name,
-        phone: data.phone,
-        email: data.email,
-        city: data.city,
-        fileName: data.fileName,
-        filePath: data.filePath,
-        fileSize: data.fileSize,
-        status: "待筛选",
-        createdAt: now,
-        updatedAt: now,
-      }).run();
+    // 使用 Drizzle 事务 - better-sqlite3 是同步的
+    // 所有操作在一个事务中执行
+    const insertCandidate = db.insert(candidates).values({
+      id: candidateId,
+      name: data.name,
+      phone: data.phone,
+      email: data.email,
+      city: data.city,
+      fileName: data.fileName,
+      filePath: data.filePath,
+      fileSize: data.fileSize,
+      status: "待筛选",
+      createdAt: now,
+      updatedAt: now,
+    }).run();
 
-      // 插入教育背景
-      if (data.education.length > 0) {
-        tx.insert(education).values(
-          data.education.map((edu) => ({
-            id: generateId(),
-            candidateId,
-            school: edu.school,
-            major: edu.major,
-            degree: edu.degree,
-            graduationTime: edu.graduationTime,
-          }))
-        ).run();
-      }
+    // 插入教育背景
+    if (data.education.length > 0) {
+      db.insert(education).values(
+        data.education.map((edu) => ({
+          id: generateId(),
+          candidateId,
+          school: edu.school,
+          major: edu.major,
+          degree: edu.degree,
+          graduationTime: edu.graduationTime,
+        }))
+      ).run();
+    }
 
-      // 插入工作经历
-      if (data.experience.length > 0) {
-        tx.insert(experience).values(
-          data.experience.map((exp) => ({
-            id: generateId(),
-            candidateId,
-            company: exp.company,
-            title: exp.title,
-            startDate: exp.startDate,
-            endDate: exp.endDate,
-            responsibilities: exp.responsibilities,
-          }))
-        ).run();
-      }
+    // 插入工作经历
+    if (data.experience.length > 0) {
+      db.insert(experience).values(
+        data.experience.map((exp) => ({
+          id: generateId(),
+          candidateId,
+          company: exp.company,
+          title: exp.title,
+          startDate: exp.startDate,
+          endDate: exp.endDate,
+          responsibilities: exp.responsibilities,
+        }))
+      ).run();
+    }
 
-      // 插入技能
-      if (data.skills.length > 0) {
-        tx.insert(skills).values(
-          data.skills.map((skill) => ({
-            id: generateId(),
-            candidateId,
-            skillType: skill.skillType,
-            skillName: skill.skillName,
-          }))
-        ).run();
-      }
-    })();
+    // 插入技能
+    if (data.skills.length > 0) {
+      db.insert(skills).values(
+        data.skills.map((skill) => ({
+          id: generateId(),
+          candidateId,
+          skillType: skill.skillType,
+          skillName: skill.skillName,
+        }))
+      ).run();
+    }
 
     // 查询并返回完整的候选人信息
     const candidate = await getCandidateById(candidateId);
