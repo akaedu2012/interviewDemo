@@ -4,11 +4,18 @@ import { NextResponse } from "next/server";
  * API 错误处理工具
  */
 
-export interface ApiError {
-  message: string;
+export class ApiError extends Error {
   code?: string;
-  status?: number;
+  status: number;
   details?: unknown;
+
+  constructor(message: string, status = 500, code?: string, details?: unknown) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.code = code;
+    this.details = details;
+  }
 }
 
 /**
@@ -63,12 +70,7 @@ export function createApiError(
   code?: string,
   details?: unknown
 ): ApiError {
-  return {
-    message,
-    status,
-    code,
-    details,
-  };
+  return new ApiError(message, status, code, details);
 }
 
 /**
