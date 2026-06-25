@@ -168,34 +168,63 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] space-y-4">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-destructive mb-2">加载失败</h2>
-          <p className="text-muted-foreground">{error}</p>
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] space-y-6 animate-in">
+        <div className="glass-hover rounded-2xl p-8 border border-red-500/30 text-center max-w-md">
+          <div className="relative inline-block mb-4">
+            <div className="absolute inset-0 bg-red-500/20 blur-2xl" />
+            <div className="relative h-20 w-20 mx-auto rounded-full border-2 border-red-500/50 flex items-center justify-center">
+              <span className="text-4xl">⚠️</span>
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-red-400 mb-3">加载失败</h2>
+          <p className="text-slate-400 mb-6">{error}</p>
+          <Button 
+            onClick={fetchCandidates}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0"
+          >
+            重试
+          </Button>
         </div>
-        <Button onClick={fetchCandidates}>重试</Button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in">
       {/* 页面标题和操作按钮 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">候选人管理</h1>
-          <p className="text-muted-foreground mt-1">查看和管理所有候选人</p>
+      <div className="glass-hover rounded-2xl p-6 border border-cyan-500/20">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full" />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+                候选人管理
+              </h1>
+            </div>
+            <p className="text-slate-400 ml-4 flex items-center space-x-2">
+              <span>查看和管理所有候选人</span>
+              <span className="text-cyan-400">·</span>
+              <span className="text-cyan-400 font-medium">共 {total} 人</span>
+            </p>
+          </div>
+          <Button 
+            onClick={handleUploadClick} 
+            size="lg"
+            className="btn-glow bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all duration-300"
+          >
+            <Upload className="h-5 w-5 mr-2" />
+            上传简历
+          </Button>
         </div>
-        <Button onClick={handleUploadClick} size="lg">
-          <Upload className="h-5 w-5 mr-2" />
-          上传简历
-        </Button>
       </div>
 
       {/* 加载状态 */}
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <LoadingSpinner size="lg" text="加载候选人列表..." />
+        <div className="flex justify-center py-20">
+          <div className="relative">
+            <div className="absolute inset-0 bg-cyan-500/20 blur-2xl animate-pulse" />
+            <LoadingSpinner size="lg" text="加载候选人列表..." />
+          </div>
         </div>
       ) : (
         <CandidateList

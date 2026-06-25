@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Calendar, TrendingUp } from "lucide-react";
+import { User, Calendar, TrendingUp, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CandidateStatus } from "@/types";
 
@@ -21,11 +21,11 @@ export interface CandidateCardProps {
 }
 
 const statusColors: Record<CandidateStatus, string> = {
-  待筛选: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-  初筛通过: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-  面试中: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-  已录用: "bg-green-100 text-green-800 hover:bg-green-200",
-  已淘汰: "bg-red-100 text-red-800 hover:bg-red-200",
+  待筛选: "status-pending",
+  初筛通过: "status-screening",
+  面试中: "status-interviewing",
+  已录用: "status-hired",
+  已淘汰: "status-rejected",
 };
 
 /**
@@ -52,47 +52,97 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
   };
 
   const getScoreColor = (score?: number) => {
-    if (score === undefined) return "text-muted-foreground";
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-yellow-600";
-    return "text-red-600";
+    if (score === undefined) return "text-slate-400";
+    if (score >= 80) return "score-high";
+    if (score >= 60) return "score-medium";
+    return "score-low";
+  };
+
+  const getScoreBg = (score?: number) => {
+    if (score === undefined) return "bg-slate-500/10 border-slate-500/30";
+    if (score >= 80) return "score-bg-high";
+    if (score >= 60) return "score-bg-medium";
+    return "score-bg-low";
   };
 
   return (
     <Card
-      className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/50"
+      className="glass-hover cursor-pointer border-cyan-500/20 card-hover group relative overflow-hidden"
       onClick={handleCardClick}
     >
-      <CardHeader className="pb-3">
+      {/* 顶部光效 */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent group-hover:via-cyan-500 transition-all duration-300" />
+      
+      {/* 背景装饰 */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl group-hover:bg-cyan-500/10 transition-all duration-300" />
+      
+      <CardHeader className="pb-3 relative z-10">
         <div className="flex items-start justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <User className="h-5 w-5 text-muted-foreground" />
-            {candidate.name || "未知"}
+          <CardTitle className="flex items-center gap-3 text-lg group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-cyan-500/20 blur-lg group-hover:bg-cyan-500/30 transition-all" />
+              <User className="h-5 w-5 text-cyan-400 relative z-10 group-hover:scale-110 transition-transform" />
+            </div>
+            <span className="text-slate-200 group-hover:text-cyan-300 transition-colors">
+              {candidate.name || "未知"}
+            </span>
           </CardTitle>
-          <Badge className={statusColors[candidate.status]} variant="secondary">
+          <Badge className={cn("px-3 py-1 text-xs font-medium", statusColors[candidate.status])} variant="secondary">
             {candidate.status}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <TrendingUp className="h-4 w-4" />
-            <span>匹配分数</span>
+      
+      <CardContent className="space-y-4 relative z-10">
+        {/* 评分显示 */}
+        <div className={cn(
+          "rounded-lg p-4 border transition-all duration-300",
+          getScoreBg(candidate.overallScore)
+        )}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm">
+              <TrendingUp className="h-4 w-4 text-cyan-400" />
+              <span className="text-slate-300">匹配分数</span>
+            </div>
+            {candidate.overallScore !== undefined ? (
+              <div className="flex items-center gap-2">
+                <span className={cn("text-3xl font-bold", getScoreColor(candidate.overallScore))}>
+                  {candidate.overallScore.toFixed(1)}
+                </span>
+                {candidate.overallScore >= 80 && (
+                  <Sparkles className="h-5 w-5 text-cyan-400 animate-pulse" />
+                )}
+              </div>
+            ) : (
+              <span className="text-sm text-slate-500">未评分</span>
+            )}
           </div>
-          {candidate.overallScore !== undefined ? (
-            <span className={cn("text-2xl font-bold", getScoreColor(candidate.overallScore))}>
-              {candidate.overallScore.toFixed(1)}
-            </span>
-          ) : (
-            <span className="text-sm text-muted-foreground">未评分</span>
+          
+          {/* 分数进度条 */}
+          {candidate.overallScore !== undefined && (
+            <div className="mt-3 h-2 bg-slate-800/50 rounded-full overflow-hidden">
+              <div 
+                className={cn(
+                  "h-full rounded-full transition-all duration-500",
+                  candidate.overallScore >= 80 ? "bg-gradient-to-r from-cyan-500 to-blue-500" :
+                  candidate.overallScore >= 60 ? "bg-gradient-to-r from-yellow-500 to-orange-500" :
+                  "bg-gradient-to-r from-red-500 to-pink-500"
+                )}
+                style={{ width: `${candidate.overallScore}%` }}
+              />
+            </div>
           )}
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Calendar className="h-4 w-4" />
+        
+        {/* 创建时间 */}
+        <div className="flex items-center gap-2 text-sm text-slate-400 pt-2 border-t border-slate-700/50">
+          <Calendar className="h-4 w-4 text-cyan-500/70" />
           <span>{formatDate(candidate.createdAt)}</span>
         </div>
       </CardContent>
+      
+      {/* 底部光效 */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent group-hover:via-blue-500/50 transition-all duration-300" />
     </Card>
   );
 }

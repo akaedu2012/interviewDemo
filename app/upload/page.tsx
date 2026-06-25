@@ -381,44 +381,79 @@ export default function UploadPage() {
   });
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto animate-in">
       {/* 页面标题 */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.push('/')}
-          title="返回候选人列表"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">上传简历</h1>
-          <p className="text-muted-foreground mt-2">
-            上传 PDF 格式的简历文件，系统将自动解析和分析
-          </p>
+      <div className="glass-hover rounded-2xl p-6 border border-cyan-500/20">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/')}
+            title="返回候选人列表"
+            className="hover:bg-white/5 hover:text-cyan-300 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1">
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full" />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+                上传简历
+              </h1>
+            </div>
+            <p className="text-slate-400 mt-2 ml-4 flex items-center space-x-2">
+              <Upload className="h-4 w-4 text-cyan-400" />
+              <span>上传 PDF 格式的简历文件，AI 将自动解析和分析</span>
+            </p>
+          </div>
         </div>
       </div>
 
       {/* 文件拖放区 */}
-      <FileDropzone
-        onFilesAccepted={handleFilesAccepted}
-        maxFiles={5}
-        disabled={isUploading}
-      />
+      <div className="relative">
+        <div className="absolute inset-0 bg-cyan-500/5 blur-3xl" />
+        <FileDropzone
+          onFilesAccepted={handleFilesAccepted}
+          maxFiles={5}
+          disabled={isUploading}
+        />
+      </div>
 
       {/* 上传文件列表 */}
       {uploadFiles.length > 0 && (
-        <FileUploadList files={uploadFiles} onRetry={handleRetry} />
+        <div className="space-y-4">
+          <div className="flex items-center space-x-3">
+            <div className="h-8 w-1 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full" />
+            <h2 className="text-xl font-semibold text-cyan-300">
+              上传进度
+            </h2>
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-cyan-500/50 to-transparent" />
+          </div>
+          <FileUploadList files={uploadFiles} onRetry={handleRetry} />
+        </div>
       )}
 
-      {/* 提示信息 */}
+      {/* 成功提示 */}
       {uploadFiles.length > 0 &&
         uploadFiles.every((f) => f.status === 'success') && (
-          <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-            <p className="text-sm text-green-700 dark:text-green-300 font-medium">
-              所有文件已成功上传和提取！即将跳转到候选人列表...
-            </p>
+          <div className="glass-hover rounded-2xl p-6 border border-cyan-500/30 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5" />
+            <div className="relative z-10 flex items-center space-x-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-cyan-500/30 blur-xl animate-pulse" />
+                <div className="relative h-12 w-12 rounded-full border-2 border-cyan-500 flex items-center justify-center">
+                  <span className="text-2xl">✓</span>
+                </div>
+              </div>
+              <div className="flex-1">
+                <p className="text-lg font-medium text-cyan-300">
+                  所有文件已成功上传和提取！
+                </p>
+                <p className="text-sm text-slate-400 mt-1">
+                  即将跳转到候选人列表...
+                </p>
+              </div>
+            </div>
           </div>
         )}
     </div>
