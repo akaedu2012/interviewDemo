@@ -59,10 +59,10 @@ export async function createCandidate(
   const now = new Date().toISOString();
 
   try {
-    // 开始事务
-    await db.transaction(async (tx) => {
+    // 开始事务 (better-sqlite3 的事务是同步的)
+    db.transaction((tx) => {
       // 插入候选人基本信息
-      await tx.insert(candidates).values({
+      tx.insert(candidates).values({
         id: candidateId,
         name: data.name,
         phone: data.phone,
@@ -74,11 +74,11 @@ export async function createCandidate(
         status: "待筛选",
         createdAt: now,
         updatedAt: now,
-      });
+      }).run();
 
       // 插入教育背景
       if (data.education.length > 0) {
-        await tx.insert(education).values(
+        tx.insert(education).values(
           data.education.map((edu) => ({
             id: generateId(),
             candidateId,
@@ -87,12 +87,12 @@ export async function createCandidate(
             degree: edu.degree,
             graduationTime: edu.graduationTime,
           }))
-        );
+        ).run();
       }
 
       // 插入工作经历
       if (data.experience.length > 0) {
-        await tx.insert(experience).values(
+        tx.insert(experience).values(
           data.experience.map((exp) => ({
             id: generateId(),
             candidateId,
@@ -102,21 +102,21 @@ export async function createCandidate(
             endDate: exp.endDate,
             responsibilities: exp.responsibilities,
           }))
-        );
+        ).run();
       }
 
       // 插入技能
       if (data.skills.length > 0) {
-        await tx.insert(skills).values(
+        tx.insert(skills).values(
           data.skills.map((skill) => ({
             id: generateId(),
             candidateId,
             skillType: skill.skillType,
             skillName: skill.skillName,
           }))
-        );
+        ).run();
       }
-    });
+    })();
 
     // 查询并返回完整的候选人信息
     const candidate = await getCandidateById(candidateId);
