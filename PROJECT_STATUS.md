@@ -2,8 +2,8 @@
 
 **项目名称**: AI 简历分析系统  
 **最后更新**: 2026-06-25  
-**Git Commit**: `3ee6e33`  
-**状态**: ✅ 准备部署
+**Git Commit**: `57319a3`  
+**状态**: ✅ 所有修复已完成，等待 Vercel 构建验证
 
 ---
 
@@ -77,58 +77,133 @@
 
 ## 🎯 当前任务清单
 
+### ✅ 已完成的所有修复（按时间顺序）
+
+#### 1. Cron Jobs 限制问题 ✅
+**Commit**: `c815e45`  
+**问题**: Vercel 免费账户不支持高频 Cron Jobs（每10分钟）  
+**修复**: 从 `vercel.json` 移除 cron 配置  
+**文档**: 创建 `VERCEL_CRON_GUIDE.md` 说明替代方案
+
+#### 2. 数据库表名引用错误 ✅
+**Commit**: `e34ef9e`, `93e67ad`, `fccf36c`  
+**问题**: API 路由引用了不存在的 `jobs` 和 `resumes` 表  
+**修复**: 
+- 修复 `app/api/metrics/route.ts` 使用正确的 `jobDescriptions` 表
+- 修复 `lib/db-health.ts` 的表名检查列表
+- 简历信息存储在 `candidates` 表中
+
+#### 3. Drizzle 配置路径问题 ✅
+**Commit**: `983c014`  
+**问题**: `drizzle.config.ts` 硬编码本地路径，Vercel 环境无法创建目录  
+**修复**: 根据 `VERCEL` 环境变量动态选择数据库路径
+- Vercel: `/tmp/resume-analyzer.db`
+- 本地: `./data/resume-analyzer.db`
+
+#### 4. postinstall 脚本错误 ✅
+**Commit**: `bd8a214`  
+**问题**: postinstall 在依赖安装完成前执行导致 drizzle-kit 找不到  
+**修复**: 移除 `postinstall` 脚本（`build:vercel` 已包含 `db:push`）
+
+#### 5. TypeScript 类型错误 ✅
+**Commit**: `57319a3`  
+**问题**: `ApiError` 定义为 interface 但使用了 `instanceof` 检查  
+**修复**: 将 `ApiError` 改为 class，继承自 Error
+
+#### 6. 清理工具脚本 ✅
+**Commit**: `3ee6e33`, `27c5e41`  
+**创建**: 批量清理 Vercel 部署的脚本
+- PowerShell 版本: `scripts/cleanup-vercel.ps1`
+- Node.js 版本: `scripts/cleanup-vercel-deployments.js`
+- 文档: `VERCEL_CLEANUP_GUIDE.md`
+
+#### 7. 重复部署配置 ✅
+**Commit**: `7a705e9`  
+**问题**: 每次 GitHub 提交触发多次 Vercel 部署  
+**修复**: 在 `vercel.json` 添加 `git.deploymentEnabled` 配置，只在 main 分支部署
+
+---
+
 ### 立即需要做的（优先级：🔥 高）
 
-#### 1. 清理 Vercel 部署 🔥
-**状态**: 待处理  
-**工具**: ✅ 已创建
+#### 1. 等待并验证 Vercel 构建 🔥
+**状态**: 等待中  
+**说明**: 所有代码修复已完成并推送到 GitHub，Vercel 应该会自动触发构建
 
 **操作步骤**:
+1. 访问 [Vercel Dashboard](https://vercel.com/dashboard)
+2. 查看 Deployments 页面
+3. 等待最新的部署（commit `57319a3`）完成
+4. 如果构建成功，验证功能：
+   - 访问 `/api/health` - 应返回 `{"status": "healthy"}`
+   - 访问 `/api/metrics` - 应返回统计数据
+   - 测试上传简历功能
+5. 如果还有错误，检查构建日志
+
+**如果需要手动触发**:
+1. 在 Vercel Dashboard 找到最新部署
+2. 点击 "Redeploy" 按钮
+3. 选择 "Use existing Build Cache" 或 "Rebuild"（如果之前失败）
+
+---
+
+#### 2. 清理 Vercel 失败部署（可选）
+**状态**: 工具已创建，待执行  
+**目的**: 清理之前失败的部署记录
+
+**如果使用 Vercel CLI**:
 ```powershell
-# 方法1: PowerShell 脚本（推荐）
 cd e:\interviewDemo
 .\scripts\cleanup-vercel.ps1
-
-# 方法2: Node.js 脚本
-node scripts/cleanup-vercel-deployments.js
 ```
 
-**预期结果**: 删除所有失败的部署，保留最近的成功部署
+**如果网络问题导致 CLI 无法使用**:
+1. 在 Vercel Dashboard 手动删除 ERROR、QUEUED、CANCELED 状态的部署
+2. 每次删除前确认不是最新的部署
+3. 保留所有 READY 状态的部署
 
 ---
 
-#### 2. 解决 Vercel 构建错误 🔥
-**状态**: 代码已修复，等待 Vercel 重新构建  
-**问题**: 数据库表名引用错误  
-**修复**: ✅ 已提交 (commit `e34ef9e`)
+#### 3. 检查重复部署问题
+**状态**: 已配置但需验证  
+**需要手动检查**:
 
-**Vercel 操作步骤**:
-1. 登录 Vercel Dashboard
-2. 进入项目 Settings
-3. 清除构建缓存（Clear Build Cache）
-4. 返回 Deployments
-5. 点击最新部署的 "Redeploy"
+**在 Vercel Dashboard**:
+1. Settings → Git
+2. 确认 Production Branch 只有 `main`
+3. 确认没有多个分支配置
 
-**验证**:
-- 访问 `/api/health` - 应返回 `"status": "healthy"`
-- 访问 `/api/metrics` - 应返回统计数据
+**在 GitHub 仓库**:
+1. Settings → Webhooks
+2. 检查是否有多个 Vercel webhook
+3. 应该只有 1 个 webhook 指向 `vercel.com`
+
+**测试**:
+1. 做一个小的测试提交（如修改 README）
+2. 观察 Vercel 是否只触发 1 次部署
+3. 如果还是多次，检查 Vercel Integrations 是否有重复
 
 ---
 
-#### 3. 设置 UptimeRobot（可选但推荐）
-**状态**: 待设置  
-**目的**: 减少冷启动，保持应用响应快速
+#### 4. 设置 UptimeRobot（推荐）
+**状态**: 可选但强烈推荐  
+**目的**: 避免冷启动，保持应用快速响应
 
 **步骤**:
 1. 访问 https://uptimerobot.com/signup/
-2. 注册免费账号
-3. 添加监控：
+2. 注册免费账号（每月 50 个监控）
+3. 添加新监控：
    - Monitor Type: HTTP(s)
+   - Friendly Name: `Resume Analyzer Health`
    - URL: `https://your-app.vercel.app/api/health`
-   - Monitoring Interval: 5 minutes
+   - Monitoring Interval: **5 minutes**
+   - Alert Contacts: 你的邮箱
 4. 保存
 
-**效果**: 应用每5分钟被访问一次，避免冷启动
+**效果**: 
+- 应用每 5 分钟被访问一次
+- 减少冷启动等待时间
+- 出现问题时会收到邮件通知
 
 ---
 
@@ -345,8 +420,9 @@ sqlite.pragma('temp_store = MEMORY');
 
 ### GitHub
 - **仓库**: https://github.com/akaedu2012/interviewDemo
-- **最新提交**: `3ee6e33`
+- **最新提交**: `57319a3` - 修复 TypeScript 类型错误
 - **分支**: main
+- **所有修复已推送**: ✅
 
 ### Vercel
 - **Dashboard**: https://vercel.com/dashboard
@@ -448,16 +524,18 @@ sqlite.pragma('temp_store = MEMORY');
 
 ## 🎯 立即行动
 
-### 第1步：清理部署（5分钟）
+### 第1步：验证 Vercel 构建（5分钟）
+1. 访问 Vercel Dashboard
+2. 检查最新部署状态（commit `57319a3`）
+3. 如果构建成功，测试 `/api/health` 和 `/api/metrics`
+4. 如果还有错误，查看构建日志
+
+### 第2步：清理失败部署（可选，5分钟）
 ```powershell
 cd e:\interviewDemo
 .\scripts\cleanup-vercel.ps1
 ```
-
-### 第2步：Vercel 重新部署（3分钟）
-1. 访问 Vercel Dashboard
-2. Settings → Clear Build Cache
-3. Deployments → Redeploy
+或在 Vercel Dashboard 手动删除
 
 ### 第3步：设置监控（2分钟）
 1. 访问 UptimeRobot
@@ -466,8 +544,8 @@ cd e:\interviewDemo
 
 ---
 
-**项目状态**: ✅ 代码完成，等待部署  
-**下一步**: 清理 Vercel 部署 → 重新构建 → 设置监控  
-**预计时间**: 10 分钟
+**项目状态**: ✅ 所有代码修复已完成并推送  
+**下一步**: 等待 Vercel 自动构建 → 验证功能 → 设置监控  
+**预计时间**: 构建 3-5 分钟 + 验证 2 分钟
 
 **Let's go! 🚀**
