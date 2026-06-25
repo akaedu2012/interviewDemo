@@ -262,23 +262,23 @@
   
   /* Status badge colors - 科技风格 */
   .status-pending {
-    @apply bg-slate-500/20 text-slate-300 border border-slate-500/30;
+    @apply bg-slate-700/90 text-slate-100 border border-slate-500/50;
   }
   
   .status-screening {
-    @apply bg-blue-500/20 text-blue-300 border border-blue-500/30;
+    @apply bg-blue-600/90 text-blue-50 border border-blue-400/50;
   }
   
   .status-interviewing {
-    @apply bg-purple-500/20 text-purple-300 border border-purple-500/30;
+    @apply bg-purple-600/90 text-purple-50 border border-purple-400/50;
   }
   
   .status-hired {
-    @apply bg-cyan-500/20 text-cyan-300 border border-cyan-500/30;
+    @apply bg-cyan-600/90 text-cyan-50 border border-cyan-400/50;
   }
   
   .status-rejected {
-    @apply bg-red-500/20 text-red-300 border border-red-500/30;
+    @apply bg-red-600/90 text-red-50 border border-red-400/50;
   }
   
   /* 发光按钮效果 */

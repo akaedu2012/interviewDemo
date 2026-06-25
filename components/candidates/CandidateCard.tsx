@@ -87,7 +87,13 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
               {candidate.name || "未知"}
             </span>
           </CardTitle>
-          <Badge className={cn("px-3 py-1 text-xs font-medium", statusColors[candidate.status])} variant="secondary">
+          <Badge 
+            className={cn(
+              "px-3 py-1 text-xs font-medium relative z-20 backdrop-blur-sm shadow-lg",
+              statusColors[candidate.status]
+            )} 
+            variant="secondary"
+          >
             {candidate.status}
           </Badge>
         </div>
