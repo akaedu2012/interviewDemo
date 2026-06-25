@@ -21,11 +21,11 @@ export interface CandidateCardProps {
 }
 
 const statusColors: Record<CandidateStatus, string> = {
-  待筛选: "status-pending",
-  初筛通过: "status-screening",
-  面试中: "status-interviewing",
-  已录用: "status-hired",
-  已淘汰: "status-rejected",
+  待筛选: "bg-slate-700 text-white border-slate-600",
+  初筛通过: "bg-blue-600 text-white border-blue-500",
+  面试中: "bg-purple-600 text-white border-purple-500",
+  已录用: "bg-cyan-600 text-white border-cyan-500",
+  已淘汰: "bg-red-600 text-white border-red-500",
 };
 
 /**
@@ -89,10 +89,11 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
           </CardTitle>
           <Badge 
             className={cn(
-              "px-3 py-1 text-xs font-medium relative z-20 backdrop-blur-sm shadow-lg",
+              "px-3 py-1.5 text-xs font-bold relative z-20 shadow-xl border-2 opacity-100",
               statusColors[candidate.status]
             )} 
             variant="secondary"
+            style={{ backgroundColor: 'rgb(var(--badge-bg, 71 85 105))', color: 'white' }}
           >
             {candidate.status}
           </Badge>
