@@ -23,7 +23,7 @@ export const maxDuration = 10;  // Vercel 免费账户最大值
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params { fileId: string } }
+  { params }: { params: { fileId: string } }
 ) {
   try {
     const { fileId } = params;
