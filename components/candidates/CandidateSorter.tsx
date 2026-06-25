@@ -39,9 +39,9 @@ export function CandidateSorter({
 
   return (
     <div className="flex items-center gap-2">
-      <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+      <ArrowUpDown className="h-4 w-4 text-cyan-400" />
       <Select value={currentValue} onValueChange={handleSortChange}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[180px] border-cyan-500/30 hover:border-cyan-500/50 text-slate-200">
           <SelectValue placeholder="选择排序方式" />
         </SelectTrigger>
         <SelectContent>
