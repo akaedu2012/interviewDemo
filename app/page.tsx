@@ -25,7 +25,7 @@ export default function Home() {
 
   // URL 参数状态
   const page = parseInt(searchParams.get("page") || "1", 10);
-  const pageSize = parseInt(searchParams.get("pageSize") || "20", 10);
+  const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
   const sortBy = (searchParams.get("sortBy") || "uploadTime") as "score" | "uploadTime";
   const sortOrder = (searchParams.get("sortOrder") || "desc") as "asc" | "desc";
   const searchKeyword = searchParams.get("search") || "";
@@ -159,6 +159,11 @@ export default function Home() {
     updateSearchParams({ page: newPage });
   };
 
+  // 处理每页数量变化
+  const handlePageSizeChange = (newPageSize: number) => {
+    updateSearchParams({ pageSize: newPageSize, page: 1 }); // 改变每页数量时重置到第1页
+  };
+
   // 跳转到上传页面
   const handleUploadClick = () => {
     router.push("/upload");
@@ -245,6 +250,7 @@ export default function Home() {
           onSkillToggle={handleSkillToggle}
           onClearFilters={handleClearFilters}
           onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
         />
       )}
     </div>

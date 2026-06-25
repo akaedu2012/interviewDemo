@@ -10,6 +10,9 @@ export type { CandidateFiltersProps } from "./CandidateFilters";
 export { CandidateSorter } from "./CandidateSorter";
 export type { CandidateSorterProps } from "./CandidateSorter";
 
+export { PageSizeSelector } from "./PageSizeSelector";
+export type { PageSizeSelectorProps } from "./PageSizeSelector";
+
 export { CandidateList } from "./CandidateList";
 export type { CandidateListProps, ViewMode } from "./CandidateList";
 

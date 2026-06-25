@@ -5,6 +5,7 @@ import { CandidateTable, CandidateTableItem } from "./CandidateTable";
 import { CandidateCard, CandidateCardItem } from "./CandidateCard";
 import { CandidateFilters } from "./CandidateFilters";
 import { CandidateSorter } from "./CandidateSorter";
+import { PageSizeSelector } from "./PageSizeSelector";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export interface CandidateListProps {
   onSkillToggle: (skill: string) => void;
   onClearFilters: () => void;
   onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
 }
 
 /**
@@ -54,6 +56,7 @@ export function CandidateList({
   onSkillToggle,
   onClearFilters,
   onPageChange,
+  onPageSizeChange,
 }: CandidateListProps) {
   const handleSortByColumn = (field: "score" | "uploadTime") => {
     // 如果点击当前排序字段，切换排序顺序
@@ -87,6 +90,10 @@ export function CandidateList({
               sortBy={sortBy}
               sortOrder={sortOrder}
               onSortChange={onSortChange}
+            />
+            <PageSizeSelector
+              pageSize={pageSize}
+              onPageSizeChange={onPageSizeChange}
             />
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
               <span className="text-sm text-slate-400">共</span>
