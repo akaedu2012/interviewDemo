@@ -66,7 +66,8 @@ export async function validateDatabaseSchema(): Promise<{
   tables: string[];
   missing: string[];
 }> {
-  const requiredTables = ['candidates', 'jobs', 'resumes'];
+  // 实际数据库中的核心表
+  const requiredTables = ['candidates', 'education', 'experience', 'skills', 'job_descriptions'];
   
   try {
     const result = db.all(sql`

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { candidates, jobs, resumes } from "@/db/schema";
+import { candidates, jobDescriptions } from "@/db/schema";
 import { sql } from "drizzle-orm";
 import { successResponse, errorResponse } from "@/lib/api-error-handler";
 import { logger } from "@/lib/logger";
@@ -18,13 +18,10 @@ export async function GET() {
     const candidateCount = db.all(sql`SELECT COUNT(*) as count FROM ${candidates}`) as { count: number }[];
     
     // 获取岗位统计
-    const jobCount = db.all(sql`SELECT COUNT(*) as count FROM ${jobs}`) as { count: number }[];
+    const jobCount = db.all(sql`SELECT COUNT(*) as count FROM ${jobDescriptions}`) as { count: number }[];
     const activeJobCount = db.all(sql`
-      SELECT COUNT(*) as count FROM ${jobs} WHERE isActive = 1
+      SELECT COUNT(*) as count FROM ${jobDescriptions} WHERE is_active = 1
     `) as { count: number }[];
-    
-    // 获取简历统计
-    const resumeCount = db.all(sql`SELECT COUNT(*) as count FROM ${resumes}`) as { count: number }[];
     
     // 获取候选人状态分布
     const statusDistribution = db.all(sql`
@@ -32,6 +29,15 @@ export async function GET() {
       FROM ${candidates} 
       GROUP BY status
     `) as { status: string; count: number }[];
+
+    // 获取简历文件统计（基于 candidates 表中的文件信息）
+    const resumeStats = db.all(sql`
+      SELECT 
+        COUNT(*) as count,
+        SUM(file_size) as totalSize
+      FROM ${candidates}
+      WHERE file_name IS NOT NULL
+    `) as { count: number; totalSize: number }[];
 
     // 获取数据库大小（如果可能）
     let dbSize = 0;
@@ -73,7 +79,9 @@ export async function GET() {
           active: activeJobCount[0]?.count || 0,
         },
         resumes: {
-          total: resumeCount[0]?.count || 0,
+          total: resumeStats[0]?.count || 0,
+          totalSize: resumeStats[0]?.totalSize || 0,
+          totalSizeFormatted: formatBytes(resumeStats[0]?.totalSize || 0),
         },
       },
     };
