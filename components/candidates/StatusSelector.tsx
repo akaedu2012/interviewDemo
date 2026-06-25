@@ -99,10 +99,10 @@ export function StatusSelector({
   const currentOption = STATUS_OPTIONS.find((opt) => opt.value === status);
 
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium">招聘状态</label>
+    <div className="space-y-3">
+      <label className="text-sm font-medium text-cyan-300">招聘状态</label>
       <Select value={status} onValueChange={handleStatusChange} disabled={isLoading}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full border-cyan-500/30 hover:border-cyan-500/50 bg-slate-800/50">
           <SelectValue>
             {currentOption && (
               <Badge variant={currentOption.variant} className="text-xs">
@@ -122,7 +122,10 @@ export function StatusSelector({
         </SelectContent>
       </Select>
       {isLoading && (
-        <p className="text-xs text-muted-foreground">正在更新状态...</p>
+        <p className="text-xs text-slate-400 flex items-center gap-2">
+          <span className="inline-block size-3 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin" />
+          正在更新状态...
+        </p>
       )}
     </div>
   );
