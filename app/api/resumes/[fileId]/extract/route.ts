@@ -38,8 +38,11 @@ export async function GET(
 ) {
   const { fileId } = params;
 
+  console.log(`[Extract SSE] 收到请求，fileId: ${fileId}`);
+
   // 验证 fileId 参数
   if (!fileId) {
+    console.error(`[Extract SSE] fileId 参数缺失`);
     return new Response(
       JSON.stringify({
         success: false,
@@ -53,19 +56,28 @@ export async function GET(
     );
   }
 
-  // 创建 ReadableStream 用于 SSE
+  // 立即返回 SSE 响应，不要等待任何异步操作
   const encoder = new TextEncoder();
+  
+  console.log(`[Extract SSE] 创建 SSE 流`);
+  
   const stream = new ReadableStream({
     async start(controller) {
-      try {
-        // 辅助函数：发送 SSE 事件
-        const sendEvent = (event: string, data: any) => {
+      // 辅助函数：发送 SSE 事件
+      const sendEvent = (event: string, data: any) => {
+        try {
           const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
           controller.enqueue(encoder.encode(message));
-        };
+          console.log(`[Extract SSE] 发送事件: ${event}`, data);
+        } catch (error) {
+          console.error(`[Extract SSE] 发送事件失败:`, error);
+        }
+      };
 
+      try {
+        console.log(`[Extract SSE] 开始处理提取流程`);
+        
         // 步骤 1: 构建文件路径并验证文件存在
-        // 根据环境选择文件路径
         const isVercel = process.env.VERCEL === '1';
         const filePath = isVercel 
           ? `/tmp/uploads/${fileId}.pdf`
@@ -74,13 +86,18 @@ export async function GET(
           ? path.join('/tmp', 'uploads', `${fileId}.pdf`)
           : path.join(process.cwd(), "public", filePath);
 
+        console.log(`[Extract SSE] 文件路径: ${fullPath}, Vercel环境: ${isVercel}`);
+
         // 检查文件是否存在
         try {
           await fs.access(fullPath);
-        } catch {
+          console.log(`[Extract SSE] 文件存在`);
+        } catch (error) {
+          console.error(`[Extract SSE] 文件不存在: ${fullPath}`, error);
           sendEvent("error", {
             error: "文件不存在或无法访问",
             code: "FILE_NOT_FOUND",
+            details: `文件路径: ${fullPath}`,
           });
           controller.close();
           return;
@@ -90,12 +107,14 @@ export async function GET(
         const fileStats = await fs.stat(fullPath);
         const fileName = `${fileId}.pdf`;
         const fileSize = fileStats.size;
+        console.log(`[Extract SSE] 文件大小: ${fileSize} 字节`);
 
-        // 步骤 2: 调用 PDF Parser 提取文本（传入完整路径）
-        console.log(`[Extract API] 开始解析 PDF 文件: ${fullPath}`);
+        // 步骤 2: 调用 PDF Parser 提取文本
+        console.log(`[Extract SSE] 开始解析 PDF`);
         const parseResult = await parseResume(fullPath);
 
         if (!parseResult.success || !parseResult.text) {
+          console.error(`[Extract SSE] PDF 解析失败:`, parseResult.error);
           sendEvent("error", {
             error: parseResult.error || "PDF 解析失败",
             code: "PDF_PARSE_ERROR",
@@ -105,17 +124,16 @@ export async function GET(
         }
 
         const resumeText = parseResult.text;
-        console.log(`[Extract API] PDF 解析成功，文本长度: ${resumeText.length}`);
+        console.log(`[Extract SSE] PDF 解析成功，文本长度: ${resumeText.length}`);
 
-        // 步骤 3: 调用 AI Extractor 的 extractAll() 生成器
-        console.log(`[Extract API] 开始 AI 提取流程`);
+        // 步骤 3: 调用 AI Extractor
+        console.log(`[Extract SSE] 开始 AI 提取`);
         
         let extractedData: any = null;
 
         for await (const progress of extractAll(resumeText)) {
-          // 在每个提取阶段通过 SSE 发送进度事件
+          // 发送进度事件
           sendEvent("progress", progress);
-          console.log(`[Extract API] 提取进度: ${progress.stage}`);
           
           // 保存最后的完整数据
           if (progress.stage === "complete") {
@@ -123,8 +141,9 @@ export async function GET(
           }
         }
 
-        // 验证是否成功提取所有数据
+        // 验证是否成功提取
         if (!extractedData || !extractedData.basicInfo) {
+          console.error(`[Extract SSE] AI 提取失败，数据不完整`);
           sendEvent("error", {
             error: "AI 提取失败，未能获取完整数据",
             code: "EXTRACTION_ERROR",
@@ -133,7 +152,9 @@ export async function GET(
           return;
         }
 
-        // 步骤 4: 转换技能数据格式为 SkillEntry 数组
+        console.log(`[Extract SSE] AI 提取成功`);
+
+        // 步骤 4: 转换技能数据格式
         const skillEntries: Array<{
           skillType: "technical" | "tool" | "language";
           skillName: string;
@@ -141,38 +162,26 @@ export async function GET(
 
         const skills = extractedData.skills as Skills;
         
-        // 技术技能
         if (skills.technical && Array.isArray(skills.technical)) {
           skills.technical.forEach((skill: string) => {
-            skillEntries.push({
-              skillType: "technical",
-              skillName: skill,
-            });
+            skillEntries.push({ skillType: "technical", skillName: skill });
           });
         }
 
-        // 工具/框架
         if (skills.tools && Array.isArray(skills.tools)) {
           skills.tools.forEach((skill: string) => {
-            skillEntries.push({
-              skillType: "tool",
-              skillName: skill,
-            });
+            skillEntries.push({ skillType: "tool", skillName: skill });
           });
         }
 
-        // 编程语言
         if (skills.languages && Array.isArray(skills.languages)) {
           skills.languages.forEach((skill: string) => {
-            skillEntries.push({
-              skillType: "language",
-              skillName: skill,
-            });
+            skillEntries.push({ skillType: "language", skillName: skill });
           });
         }
 
-        // 步骤 5: 调用 Candidate Manager 保存候选人数据
-        console.log(`[Extract API] 开始保存候选人数据`);
+        // 步骤 5: 保存候选人数据
+        console.log(`[Extract SSE] 开始保存候选人数据`);
         
         const candidateData = {
           name: extractedData.basicInfo.name,
@@ -188,44 +197,52 @@ export async function GET(
         };
 
         const candidate = await createCandidate(candidateData);
-        console.log(`[Extract API] 候选人数据保存成功，ID: ${candidate.id}`);
+        console.log(`[Extract SSE] 候选人保存成功，ID: ${candidate.id}`);
 
-        // 步骤 6: 发送 complete 事件返回 candidateId
+        // 步骤 6: 发送完成事件
         sendEvent("complete", {
           candidateId: candidate.id,
           message: "简历信息提取完成",
         });
 
-        // 关闭流
+        console.log(`[Extract SSE] 流程完成，关闭连接`);
         controller.close();
       } catch (error) {
-        console.error("[Extract API] 处理过程中发生错误:", error);
+        console.error("[Extract SSE] 处理过程中发生错误:", error);
 
         // 发送错误事件
         const sendEvent = (event: string, data: any) => {
-          const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-          controller.enqueue(encoder.encode(message));
+          try {
+            const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+            controller.enqueue(encoder.encode(message));
+          } catch (e) {
+            console.error("[Extract SSE] 发送错误事件失败:", e);
+          }
         };
 
         let errorMessage = "处理过程中发生未知错误";
         let errorCode = "INTERNAL_ERROR";
+        let errorDetails = undefined;
 
         if (error instanceof Error) {
           errorMessage = error.message;
+          errorDetails = error.stack;
           
-          // 根据错误消息确定错误代码
           if (errorMessage.includes("PDF")) {
             errorCode = "PDF_PARSE_ERROR";
           } else if (errorMessage.includes("AI") || errorMessage.includes("提取")) {
             errorCode = "EXTRACTION_ERROR";
           } else if (errorMessage.includes("数据库") || errorMessage.includes("保存")) {
             errorCode = "DATABASE_ERROR";
+          } else if (errorMessage.includes("API") || errorMessage.includes("DEEPSEEK")) {
+            errorCode = "AI_API_ERROR";
           }
         }
 
         sendEvent("error", {
           error: errorMessage,
           code: errorCode,
+          details: process.env.NODE_ENV === 'development' ? errorDetails : undefined,
         });
 
         controller.close();
@@ -233,13 +250,15 @@ export async function GET(
     },
   });
 
-  // 返回 SSE 响应
+  // 返回 SSE 响应，确保正确的 headers
+  console.log(`[Extract SSE] 返回 SSE 响应`);
   return new Response(stream, {
+    status: 200,
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
       "Connection": "keep-alive",
-      "X-Accel-Buffering": "no", // 禁用 Nginx 缓冲
+      "X-Accel-Buffering": "no",
     },
   });
 }
