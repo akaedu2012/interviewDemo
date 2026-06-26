@@ -269,7 +269,7 @@ export async function listCandidates(
         );
 
       const candidateIds: string[] = [
-        ...new Set(candidateIdsWithSkills.map((s: typeof skills.$inferSelect) => s.candidateId)),
+        ...new Set<string>(candidateIdsWithSkills.map((s: typeof skills.$inferSelect) => s.candidateId)),
       ];
 
       if (candidateIds.length > 0) {
