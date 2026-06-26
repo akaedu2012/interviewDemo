@@ -74,6 +74,29 @@ export async function GET(
         }
       };
 
+      // 全局错误处理：确保所有错误都通过 SSE 返回
+      const handleError = (error: unknown, code: string = "INTERNAL_ERROR") => {
+        console.error("[Extract SSE] 处理错误:", error);
+
+        let errorMessage = "处理过程中发生未知错误";
+        let errorDetails = undefined;
+
+        if (error instanceof Error) {
+          errorMessage = error.message;
+          errorDetails = process.env.NODE_ENV === 'development' ? error.stack : undefined;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        }
+
+        sendEvent("error", {
+          error: errorMessage,
+          code,
+          details: errorDetails,
+        });
+
+        controller.close();
+      };
+
       try {
         console.log(`[Extract SSE] 开始处理提取流程`);
         
@@ -233,44 +256,8 @@ export async function GET(
         console.log(`[Extract SSE] 流程完成，关闭连接`);
         controller.close();
       } catch (error) {
-        console.error("[Extract SSE] 处理过程中发生错误:", error);
-
-        // 发送错误事件
-        const sendEvent = (event: string, data: any) => {
-          try {
-            const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-            controller.enqueue(encoder.encode(message));
-          } catch (e) {
-            console.error("[Extract SSE] 发送错误事件失败:", e);
-          }
-        };
-
-        let errorMessage = "处理过程中发生未知错误";
-        let errorCode = "INTERNAL_ERROR";
-        let errorDetails = undefined;
-
-        if (error instanceof Error) {
-          errorMessage = error.message;
-          errorDetails = error.stack;
-          
-          if (errorMessage.includes("PDF")) {
-            errorCode = "PDF_PARSE_ERROR";
-          } else if (errorMessage.includes("AI") || errorMessage.includes("提取")) {
-            errorCode = "EXTRACTION_ERROR";
-          } else if (errorMessage.includes("数据库") || errorMessage.includes("保存")) {
-            errorCode = "DATABASE_ERROR";
-          } else if (errorMessage.includes("API") || errorMessage.includes("DEEPSEEK")) {
-            errorCode = "AI_API_ERROR";
-          }
-        }
-
-        sendEvent("error", {
-          error: errorMessage,
-          code: errorCode,
-          details: process.env.NODE_ENV === 'development' ? errorDetails : undefined,
-        });
-
-        controller.close();
+        // 使用统一的错误处理
+        handleError(error, "INTERNAL_ERROR");
       }
     },
   });
