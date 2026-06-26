@@ -78,7 +78,7 @@ export async function createCandidate(
     // 插入教育背景
     if (data.education.length > 0) {
       db.insert(education).values(
-        data.education.map((edu) => ({
+        data.education.map((edu: CreateCandidateInput['education'][0]) => ({
           id: generateId(),
           candidateId,
           school: edu.school,
@@ -92,7 +92,7 @@ export async function createCandidate(
     // 插入工作经历
     if (data.experience.length > 0) {
       db.insert(experience).values(
-        data.experience.map((exp) => ({
+        data.experience.map((exp: CreateCandidateInput['experience'][0]) => ({
           id: generateId(),
           candidateId,
           company: exp.company,
@@ -107,7 +107,7 @@ export async function createCandidate(
     // 插入技能
     if (data.skills.length > 0) {
       db.insert(skills).values(
-        data.skills.map((skill) => ({
+        data.skills.map((skill: CreateCandidateInput['skills'][0]) => ({
           id: generateId(),
           candidateId,
           skillType: skill.skillType,
@@ -264,7 +264,7 @@ export async function listCandidates(
         .where(
           inArray(
             skills.skillName,
-            skillFilters.map((s) => s.toLowerCase())
+            skillFilters.map((s: string) => s.toLowerCase())
           )
         );
 
@@ -386,9 +386,9 @@ export async function listCandidates(
       );
 
       // 获取完整的候选人信息
-      const candidateIds = paginatedCandidates.map((c) => c.candidate.id);
+      const candidateIds = paginatedCandidates.map((c: { candidate: typeof candidates.$inferSelect; score: number | null }) => c.candidate.id);
       const fullCandidates = await Promise.all(
-        candidateIds.map((id) => getCandidateById(id))
+        candidateIds.map((id: string) => getCandidateById(id))
       );
 
       return {
@@ -424,7 +424,7 @@ export async function listCandidates(
 
       // 获取完整的候选人信息
       const fullCandidates = await Promise.all(
-        candidatesData.map((c) => getCandidateById(c.id))
+        candidatesData.map((c: typeof candidates.$inferSelect) => getCandidateById(c.id))
       );
 
       return {
