@@ -268,7 +268,7 @@ export async function listCandidates(
           )
         );
 
-      const candidateIds = [
+      const candidateIds: string[] = [
         ...new Set(candidateIdsWithSkills.map((s: typeof skills.$inferSelect) => s.candidateId)),
       ];
 
