@@ -140,8 +140,13 @@ export async function parseResume(filePath: string): Promise<ParseResult> {
               if (text.R && Array.isArray(text.R)) {
                 for (const run of text.R) {
                   if (run.T) {
-                    // 解码 URI 编码的文本
-                    fullText += decodeURIComponent(run.T) + " ";
+                    try {
+                      // 安全解码 URI 编码的文本
+                      fullText += decodeURIComponent(run.T) + " ";
+                    } catch (decodeError) {
+                      // 如果解码失败，直接使用原始文本
+                      fullText += run.T + " ";
+                    }
                   }
                 }
               }
