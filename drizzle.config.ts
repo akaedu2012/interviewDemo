@@ -1,14 +1,18 @@
 import type { Config } from "drizzle-kit";
 
-// 根据环境选择数据库路径
-const isVercel = process.env.VERCEL === '1';
-const dbPath = isVercel ? '/tmp/resume-analyzer.db' : './data/resume-analyzer.db';
+// 检查是否使用 Turso
+const useTurso = process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN;
 
 export default {
   schema: "./db/schema.ts",
   out: "./drizzle",
   dialect: "sqlite",
-  dbCredentials: {
-    url: dbPath,
-  },
+  dbCredentials: useTurso
+    ? {
+        url: process.env.TURSO_DATABASE_URL!,
+        authToken: process.env.TURSO_AUTH_TOKEN!,
+      }
+    : {
+        url: "./data/resume-analyzer.db",
+      },
 } satisfies Config;
