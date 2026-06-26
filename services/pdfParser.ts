@@ -114,9 +114,15 @@ export async function parseResume(filePath: string): Promise<ParseResult> {
       // 使用 pdfjs-dist（Mozilla PDF.js）
       const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
       
+      // 禁用 worker（Node.js 环境不需要）
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      
       // 加载 PDF 文档
       const loadingTask = pdfjsLib.getDocument({
         data: new Uint8Array(dataBuffer),
+        useWorkerFetch: false,
+        isEvalSupported: false,
+        useSystemFonts: true,
       });
       
       const pdfDocument = await loadingTask.promise;
@@ -254,8 +260,15 @@ export async function getPDFMetadata(filePath: string): Promise<{
 
     // 使用 pdfjs-dist 解析
     const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
+    
+    // 禁用 worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+    
     const loadingTask = pdfjsLib.getDocument({
       data: new Uint8Array(dataBuffer),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true,
     });
     const pdfDocument = await loadingTask.promise;
 
