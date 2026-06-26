@@ -30,7 +30,7 @@ export async function createOrUpdateJob(
 
   try {
     // 使用事务确保数据一致性
-    db.transaction((tx) => {
+    db.transaction((tx: any) => {
       // 将所有现有岗位设为 inactive
       tx.update(jobDescriptions)
         .set({
