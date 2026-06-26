@@ -130,10 +130,20 @@ export async function GET(
         console.log(`[Extract SSE] 开始 AI 提取`);
         
         let extractedData: any = null;
+        let progressCount = 0;
 
         for await (const progress of extractAll(resumeText)) {
+          progressCount++;
+          
           // 发送进度事件
           sendEvent("progress", progress);
+          
+          // 添加适当的延迟，使前端能看到进度变化
+          // 除了最后一个进度事件外，其他都稍微延迟
+          if (progress.stage !== "complete" && progressCount < 5) {
+            // 每个阶段延迟 300-500ms，让用户看到进度
+            await new Promise(resolve => setTimeout(resolve, 400));
+          }
           
           // 保存最后的完整数据
           if (progress.stage === "complete") {
