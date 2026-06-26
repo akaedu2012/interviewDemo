@@ -18,10 +18,25 @@ interface PDFViewerProps {
 export function PDFViewer({ filePath, fileName }: PDFViewerProps) {
   const [loadError, setLoadError] = useState(false);
 
+  // 将文件路径转换为可访问的 URL
+  const getViewableUrl = () => {
+    // 如果是 /tmp/uploads/xxx.pdf 或 /uploads/xxx.pdf 格式
+    // 提取文件名并使用 API 路由
+    const match = filePath.match(/\/([^\/]+)$/);
+    if (match) {
+      const filename = match[1];
+      return `/api/files/${filename}`;
+    }
+    // 如果已经是完整 URL，直接使用
+    return filePath;
+  };
+
+  const viewableUrl = getViewableUrl();
+
   // 处理下载
   const handleDownload = () => {
     const link = document.createElement("a");
-    link.href = filePath;
+    link.href = viewableUrl;
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
@@ -71,7 +86,7 @@ export function PDFViewer({ filePath, fileName }: PDFViewerProps) {
             </div>
           ) : (
             <iframe
-              src={filePath}
+              src={viewableUrl}
               className="w-full h-[600px] border border-cyan-500/20 rounded-lg bg-slate-900/50"
               title="PDF Preview"
               onError={() => setLoadError(true)}
