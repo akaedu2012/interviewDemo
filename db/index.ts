@@ -14,6 +14,7 @@ const useTurso = process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN;
 
 // 数据库实例（延迟初始化）
 let dbInstance: any = null;
+let isLibsql = false; // 标记是否使用 libsql（Turso）
 
 // 初始化数据库（异步）
 async function initializeDatabase() {
@@ -36,6 +37,7 @@ async function initializeDatabase() {
     });
     
     dbInstance = drizzleLibsql(client, { schema });
+    isLibsql = true; // 标记为 libsql
     log(`Turso 连接成功`);
     
     // Turso 云数据库不需要初始化表结构（通过 drizzle-kit push 完成）
@@ -203,8 +205,9 @@ async function initializeDatabase() {
           const defaultJobId = 'default-job-' + Date.now();
           log(`开始插入默认岗位描述，ID: ${defaultJobId}`);
           
-          // 使用 Drizzle ORM 插入，更安全
-          dbInstance.insert(schema.jobDescriptions).values({
+          // 使用 Drizzle ORM 插入
+          // better-sqlite3 需要同步 API，libsql 需要异步 API
+          const insertQuery = dbInstance.insert(schema.jobDescriptions).values({
             id: defaultJobId,
             title: '全栈开发工程师',
             description: '我们正在寻找一位经验丰富的全栈开发工程师，负责开发和维护公司的核心产品。',
@@ -213,7 +216,12 @@ async function initializeDatabase() {
             isActive: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-          }).run();
+          });
+          
+          // better-sqlite3 使用同步 .run()
+          if (insertQuery.run) {
+            insertQuery.run();
+          }
           
           log(`默认岗位描述创建成功`);
         } catch (jobError) {
@@ -246,7 +254,7 @@ const db = new Proxy({} as any, {
 const dbInitPromise = initializeDatabase();
 
 // 导出数据库实例和初始化函数
-export { db, initializeDatabase, dbInitPromise };
+export { db, initializeDatabase, dbInitPromise, isLibsql };
 
 // 导出 schema 以供使用
 export * from "./schema";

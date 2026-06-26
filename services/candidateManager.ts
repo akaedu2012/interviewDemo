@@ -1,4 +1,4 @@
-import { db, candidates, education, experience, skills, matchScores } from "@/db";
+import { db, candidates, education, experience, skills, matchScores, isLibsql } from "@/db";
 import { eq, and, desc, asc, like, inArray, or, sql } from "drizzle-orm";
 import { generateId } from "@/lib/utils";
 import type {
@@ -59,8 +59,8 @@ export async function createCandidate(
   const now = new Date().toISOString();
 
   try {
-    // 使用 Drizzle 事务 - 支持异步
-    await db.insert(candidates).values({
+    // 插入候选人基本信息
+    const insertCandidate = db.insert(candidates).values({
       id: candidateId,
       name: data.name,
       phone: data.phone,
@@ -73,10 +73,17 @@ export async function createCandidate(
       createdAt: now,
       updatedAt: now,
     });
+    
+    // 兼容 better-sqlite3 (同步) 和 libsql (异步)
+    if (isLibsql) {
+      await insertCandidate;
+    } else if ((insertCandidate as any).run) {
+      (insertCandidate as any).run();
+    }
 
     // 插入教育背景
     if (data.education.length > 0) {
-      await db.insert(education).values(
+      const insertEducation = db.insert(education).values(
         data.education.map((edu: CreateCandidateInput['education'][0]) => ({
           id: generateId(),
           candidateId,
@@ -86,11 +93,17 @@ export async function createCandidate(
           graduationTime: edu.graduationTime,
         }))
       );
+      
+      if (isLibsql) {
+        await insertEducation;
+      } else if ((insertEducation as any).run) {
+        (insertEducation as any).run();
+      }
     }
 
     // 插入工作经历
     if (data.experience.length > 0) {
-      await db.insert(experience).values(
+      const insertExperience = db.insert(experience).values(
         data.experience.map((exp: CreateCandidateInput['experience'][0]) => ({
           id: generateId(),
           candidateId,
@@ -101,11 +114,17 @@ export async function createCandidate(
           responsibilities: exp.responsibilities,
         }))
       );
+      
+      if (isLibsql) {
+        await insertExperience;
+      } else if ((insertExperience as any).run) {
+        (insertExperience as any).run();
+      }
     }
 
     // 插入技能
     if (data.skills.length > 0) {
-      await db.insert(skills).values(
+      const insertSkills = db.insert(skills).values(
         data.skills.map((skill: CreateCandidateInput['skills'][0]) => ({
           id: generateId(),
           candidateId,
@@ -113,6 +132,12 @@ export async function createCandidate(
           skillName: skill.skillName,
         }))
       );
+      
+      if (isLibsql) {
+        await insertSkills;
+      } else if ((insertSkills as any).run) {
+        (insertSkills as any).run();
+      }
     }
 
     // 查询并返回完整的候选人信息

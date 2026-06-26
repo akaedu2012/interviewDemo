@@ -1,4 +1,4 @@
-import { db, jobDescriptions } from "@/db";
+import { db, jobDescriptions, isLibsql } from "@/db";
 import { eq, desc } from "drizzle-orm";
 import { generateId } from "@/lib/utils";
 import type { JobDescription } from "@/types";
@@ -30,16 +30,23 @@ export async function createOrUpdateJob(
 
   try {
     // 将所有现有岗位设为 inactive
-    await db
+    const updateQuery = db
       .update(jobDescriptions)
       .set({
         isActive: false,
         updatedAt: now,
       })
       .where(eq(jobDescriptions.isActive, true));
+    
+    // 兼容 better-sqlite3 (同步) 和 libsql (异步)
+    if (isLibsql) {
+      await updateQuery;
+    } else if ((updateQuery as any).run) {
+      (updateQuery as any).run();
+    }
 
     // 插入新岗位描述
-    await db.insert(jobDescriptions).values({
+    const insertQuery = db.insert(jobDescriptions).values({
       id: jobId,
       title: data.title,
       description: data.description,
@@ -49,6 +56,12 @@ export async function createOrUpdateJob(
       createdAt: now,
       updatedAt: now,
     });
+    
+    if (isLibsql) {
+      await insertQuery;
+    } else if ((insertQuery as any).run) {
+      (insertQuery as any).run();
+    }
 
     // 查询并返回创建的岗位信息
     const job = await getJobById(jobId);
