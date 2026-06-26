@@ -1,4 +1,4 @@
-import { db, candidates, education, experience, skills, matchScores, isLibsql } from "@/db";
+import { db, candidates, education, experience, skills, matchScores, isLibsqlDb } from "@/db";
 import { eq, and, desc, asc, like, inArray, or, sql } from "drizzle-orm";
 import { generateId } from "@/lib/utils";
 import type {
@@ -75,7 +75,7 @@ export async function createCandidate(
     });
     
     // 兼容 better-sqlite3 (同步) 和 libsql (异步)
-    if (isLibsql) {
+    if (isLibsqlDb) {
       await insertCandidate;
     } else if ((insertCandidate as any).run) {
       (insertCandidate as any).run();
@@ -94,7 +94,7 @@ export async function createCandidate(
         }))
       );
       
-      if (isLibsql) {
+      if (isLibsqlDb) {
         await insertEducation;
       } else if ((insertEducation as any).run) {
         (insertEducation as any).run();
@@ -115,7 +115,7 @@ export async function createCandidate(
         }))
       );
       
-      if (isLibsql) {
+      if (isLibsqlDb) {
         await insertExperience;
       } else if ((insertExperience as any).run) {
         (insertExperience as any).run();
@@ -133,7 +133,7 @@ export async function createCandidate(
         }))
       );
       
-      if (isLibsql) {
+      if (isLibsqlDb) {
         await insertSkills;
       } else if ((insertSkills as any).run) {
         (insertSkills as any).run();

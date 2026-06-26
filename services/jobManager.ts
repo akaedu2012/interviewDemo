@@ -1,4 +1,4 @@
-import { db, jobDescriptions, isLibsql } from "@/db";
+import { db, jobDescriptions, isLibsqlDb } from "@/db";
 import { eq, desc } from "drizzle-orm";
 import { generateId } from "@/lib/utils";
 import type { JobDescription } from "@/types";
@@ -39,7 +39,7 @@ export async function createOrUpdateJob(
       .where(eq(jobDescriptions.isActive, true));
     
     // 兼容 better-sqlite3 (同步) 和 libsql (异步)
-    if (isLibsql) {
+    if (isLibsqlDb) {
       await updateQuery;
     } else if ((updateQuery as any).run) {
       (updateQuery as any).run();
@@ -57,7 +57,7 @@ export async function createOrUpdateJob(
       updatedAt: now,
     });
     
-    if (isLibsql) {
+    if (isLibsqlDb) {
       await insertQuery;
     } else if ((insertQuery as any).run) {
       (insertQuery as any).run();

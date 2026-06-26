@@ -14,7 +14,7 @@ const useTurso = process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN;
 
 // 数据库实例（延迟初始化）
 let dbInstance: any = null;
-let isLibsql = false; // 标记是否使用 libsql（Turso）
+let isLibsqlDb = false; // 标记是否使用 libsql（Turso）- 模块级变量
 
 // 初始化数据库（异步）
 async function initializeDatabase() {
@@ -37,7 +37,7 @@ async function initializeDatabase() {
     });
     
     dbInstance = drizzleLibsql(client, { schema });
-    isLibsql = true; // 标记为 libsql
+    isLibsqlDb = true; // 标记为 libsql
     log(`Turso 连接成功`);
     
     // Turso 云数据库不需要初始化表结构（通过 drizzle-kit push 完成）
@@ -254,7 +254,7 @@ const db = new Proxy({} as any, {
 const dbInitPromise = initializeDatabase();
 
 // 导出数据库实例和初始化函数
-export { db, initializeDatabase, dbInitPromise, isLibsql };
+export { db, initializeDatabase, dbInitPromise, isLibsqlDb };
 
 // 导出 schema 以供使用
 export * from "./schema";
