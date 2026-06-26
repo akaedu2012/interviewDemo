@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createOrUpdateJob } from "@/services/jobManager";
 import { dbInitPromise } from "@/db";
 
+// 标记此路由为动态路由，防止构建时预渲染
+export const dynamic = 'force-dynamic';
+
 // Zod schema for validating job description data
 const jobDescriptionSchema = z.object({
   title: z.string().min(1, "Job title cannot be empty"),

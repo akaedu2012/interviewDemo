@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCandidateById } from "@/services/candidateManager";
 import { dbInitPromise } from "@/db";
 
+// 标记此路由为动态路由，防止构建时预渲染
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/candidates/[id]
  * 获取候选人详情

@@ -4,6 +4,9 @@ import { updateCandidateStatus, getCandidateById } from "@/services/candidateMan
 import { dbInitPromise } from "@/db";
 import type { CandidateStatus } from "@/types";
 
+// 标记此路由为动态路由，防止构建时预渲染
+export const dynamic = 'force-dynamic';
+
 // Zod schema for validating candidate status
 const candidateStatusSchema = z.object({
   status: z.enum(["待筛选", "初筛通过", "面试中", "已录用", "已淘汰"]),

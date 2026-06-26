@@ -5,6 +5,9 @@ import { getJobById } from "@/services/jobManager";
 import { calculateMatch } from "@/services/jobMatcher";
 import { dbInitPromise } from "@/db";
 
+// 标记此路由为动态路由，防止构建时预渲染
+export const dynamic = 'force-dynamic';
+
 /**
  * 任务 6.6 - 实现匹配评分计算触发 API
  * POST /api/candidates/[id]/match

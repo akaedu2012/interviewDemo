@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getActiveJob } from "@/services/jobManager";
 import { dbInitPromise } from "@/db";
 
+// 标记此路由为动态路由，防止构建时预渲染
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/jobs/active
  * 获取当前激活的岗位描述
