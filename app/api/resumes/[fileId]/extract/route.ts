@@ -77,6 +77,21 @@ export async function GET(
       try {
         console.log(`[Extract SSE] 开始处理提取流程`);
         
+        // 步骤 0: 验证 API Key 是否配置
+        const apiKey = process.env.DEEPSEEK_API_KEY;
+        console.log(`[Extract SSE] API Key 检查: ${apiKey ? `存在 (长度: ${apiKey.length})` : '不存在'}`);
+        
+        if (!apiKey) {
+          console.error(`[Extract SSE] DEEPSEEK_API_KEY 未配置`);
+          sendEvent("error", {
+            error: "AI API 密钥未配置，请联系管理员配置 DEEPSEEK_API_KEY 环境变量",
+            code: "AI_API_KEY_MISSING",
+            details: "Environment variable DEEPSEEK_API_KEY is not set",
+          });
+          controller.close();
+          return;
+        }
+        
         // 步骤 1: 构建文件路径并验证文件存在
         const isVercel = process.env.VERCEL === '1';
         const filePath = isVercel 
