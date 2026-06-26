@@ -104,47 +104,56 @@ export async function parseResume(filePath: string): Promise<ParseResult> {
       };
     }
 
-    // 解析 PDF 文件 using pdfjs-dist (纯 JS 实现，无需原生依赖)
+    // 解析 PDF 文件 using pdf2json (专为 Node.js 设计)
     let pdfData: {
       numpages: number;
       text: string;
     };
 
     try {
-      // 使用 pdfjs-dist（Mozilla PDF.js）
-      const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
-      
-      // 禁用 worker（Node.js 环境不需要）
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-      
-      // 加载 PDF 文档
-      const loadingTask = pdfjsLib.getDocument({
-        data: new Uint8Array(dataBuffer),
-        useWorkerFetch: false,
-        isEvalSupported: false,
-        useSystemFonts: true,
+      // 使用 pdf2json - 专为 Node.js 设计，无需 canvas 或 worker
+      const PDFParser = require("pdf2json");
+      const pdfParser = new PDFParser();
+
+      // 创建 Promise 来处理异步解析
+      const parsePromise = new Promise<any>((resolve, reject) => {
+        pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+          resolve(pdfData);
+        });
+
+        pdfParser.on("pdfParser_dataError", (errData: any) => {
+          reject(new Error(errData.parserError));
+        });
+
+        // 解析 PDF
+        pdfParser.parseBuffer(dataBuffer);
       });
-      
-      const pdfDocument = await loadingTask.promise;
-      const numPages = pdfDocument.numPages;
-      
-      // 提取所有页面的文本
-      const textPromises = [];
-      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-        textPromises.push(
-          pdfDocument.getPage(pageNum).then(async (page: any) => {
-            const textContent = await page.getTextContent();
-            return textContent.items.map((item: any) => item.str).join(" ");
-          })
-        );
+
+      const result = await parsePromise;
+
+      // 提取文本
+      let fullText = "";
+      if (result.Pages && Array.isArray(result.Pages)) {
+        for (const page of result.Pages) {
+          if (page.Texts && Array.isArray(page.Texts)) {
+            for (const text of page.Texts) {
+              if (text.R && Array.isArray(text.R)) {
+                for (const run of text.R) {
+                  if (run.T) {
+                    // 解码 URI 编码的文本
+                    fullText += decodeURIComponent(run.T) + " ";
+                  }
+                }
+              }
+            }
+            fullText += "\n"; // 每个文本块后换行
+          }
+        }
       }
-      
-      const pageTexts = await Promise.all(textPromises);
-      const fullText = pageTexts.join("\n");
-      
+
       pdfData = {
-        numpages: numPages,
-        text: fullText,
+        numpages: result.Pages?.length || 0,
+        text: fullText.trim(),
       };
     } catch (parseError) {
       console.error("PDF parsing failed:", parseError);
@@ -258,23 +267,27 @@ export async function getPDFMetadata(filePath: string): Promise<{
     // 读取文件内容
     const dataBuffer = await fs.readFile(fullPath);
 
-    // 使用 pdfjs-dist 解析
-    const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
-    
-    // 禁用 worker
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-    
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(dataBuffer),
-      useWorkerFetch: false,
-      isEvalSupported: false,
-      useSystemFonts: true,
+    // 使用 pdf2json 解析元数据
+    const PDFParser = require("pdf2json");
+    const pdfParser = new PDFParser();
+
+    const parsePromise = new Promise<any>((resolve, reject) => {
+      pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+        resolve(pdfData);
+      });
+
+      pdfParser.on("pdfParser_dataError", (errData: any) => {
+        reject(new Error(errData.parserError));
+      });
+
+      pdfParser.parseBuffer(dataBuffer);
     });
-    const pdfDocument = await loadingTask.promise;
+
+    const result = await parsePromise;
 
     return {
       success: true,
-      pageCount: pdfDocument.numPages,
+      pageCount: result.Pages?.length || 0,
     };
   } catch (error) {
     console.error("Failed to get PDF metadata:", error);
