@@ -44,6 +44,14 @@ export default function JobConfigPage() {
       try {
         setIsFetching(true);
         const response = await fetch("/api/jobs/active");
+        
+        // 如果是 404，说明还没有岗位描述，这是正常情况
+        if (response.status === 404) {
+          console.log("No active job found, starting with empty form");
+          setIsFetching(false);
+          return;
+        }
+        
         const data = await response.json();
 
         if (response.ok && data.success) {
