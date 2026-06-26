@@ -8,9 +8,9 @@ const log = (message: string) => {
   console.log(`[DB Init ${timestamp}] ${message}`);
 };
 
-// 检查环境：Vercel 环境且配置了 Turso 凭证则使用 Turso
+// 检查环境：只有在 Vercel 环境中且配置了 Turso 凭证时才使用 Turso
 const isVercel = process.env.VERCEL === '1';
-const useTurso = process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN;
+const useTurso = isVercel && process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN;
 
 // 数据库实例（延迟初始化）
 let dbInstance: any = null;
