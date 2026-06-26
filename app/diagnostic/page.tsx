@@ -284,9 +284,9 @@ export default function DiagnosticPage() {
                 重新检查
               </Button>
               {result.diagnostics.checks.deepseekApiKey.exists && (
-                <Button asChild className="flex-1">
-                  <a href="/upload">前往上传简历</a>
-                </Button>
+                <a href="/upload" className="flex-1">
+                  <Button className="w-full">前往上传简历</Button>
+                </a>
               )}
             </div>
           </div>
