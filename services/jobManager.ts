@@ -29,30 +29,25 @@ export async function createOrUpdateJob(
   const now = new Date().toISOString();
 
   try {
-    // 使用事务确保数据一致性
-    db.transaction((tx: any) => {
-      // 将所有现有岗位设为 inactive
-      tx.update(jobDescriptions)
-        .set({
-          isActive: false,
-          updatedAt: now,
-        })
-        .where(eq(jobDescriptions.isActive, true))
-        .run();
+    // 将所有现有岗位设为 inactive
+    await db
+      .update(jobDescriptions)
+      .set({
+        isActive: false,
+        updatedAt: now,
+      })
+      .where(eq(jobDescriptions.isActive, true));
 
-      // 插入新岗位描述
-      tx.insert(jobDescriptions)
-        .values({
-          id: jobId,
-          title: data.title,
-          description: data.description,
-          requiredSkills: JSON.stringify(data.requiredSkills),
-          preferredSkills: JSON.stringify(data.preferredSkills),
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        })
-        .run();
+    // 插入新岗位描述
+    await db.insert(jobDescriptions).values({
+      id: jobId,
+      title: data.title,
+      description: data.description,
+      requiredSkills: JSON.stringify(data.requiredSkills),
+      preferredSkills: JSON.stringify(data.preferredSkills),
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
     });
 
     // 查询并返回创建的岗位信息

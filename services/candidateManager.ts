@@ -59,9 +59,8 @@ export async function createCandidate(
   const now = new Date().toISOString();
 
   try {
-    // 使用 Drizzle 事务 - better-sqlite3 是同步的
-    // 所有操作在一个事务中执行
-    const insertCandidate = db.insert(candidates).values({
+    // 使用 Drizzle 事务 - 支持异步
+    await db.insert(candidates).values({
       id: candidateId,
       name: data.name,
       phone: data.phone,
@@ -73,11 +72,11 @@ export async function createCandidate(
       status: "待筛选",
       createdAt: now,
       updatedAt: now,
-    }).run();
+    });
 
     // 插入教育背景
     if (data.education.length > 0) {
-      db.insert(education).values(
+      await db.insert(education).values(
         data.education.map((edu: CreateCandidateInput['education'][0]) => ({
           id: generateId(),
           candidateId,
@@ -86,12 +85,12 @@ export async function createCandidate(
           degree: edu.degree,
           graduationTime: edu.graduationTime,
         }))
-      ).run();
+      );
     }
 
     // 插入工作经历
     if (data.experience.length > 0) {
-      db.insert(experience).values(
+      await db.insert(experience).values(
         data.experience.map((exp: CreateCandidateInput['experience'][0]) => ({
           id: generateId(),
           candidateId,
@@ -101,19 +100,19 @@ export async function createCandidate(
           endDate: exp.endDate,
           responsibilities: exp.responsibilities,
         }))
-      ).run();
+      );
     }
 
     // 插入技能
     if (data.skills.length > 0) {
-      db.insert(skills).values(
+      await db.insert(skills).values(
         data.skills.map((skill: CreateCandidateInput['skills'][0]) => ({
           id: generateId(),
           candidateId,
           skillType: skill.skillType,
           skillName: skill.skillName,
         }))
-      ).run();
+      );
     }
 
     // 查询并返回完整的候选人信息
