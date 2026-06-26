@@ -73,7 +73,13 @@ export default function CandidateDetailPage({
       const jobData = await jobResponse.json();
 
       if (!jobResponse.ok || !jobData.success) {
-        throw new Error("请先配置岗位描述");
+        // 如果没有岗位描述，提供友好提示
+        Notification.error(
+          "无法开始评分",
+          "请先在【岗位配置】页面配置岗位描述"
+        );
+        setIsMatching(false);
+        return;
       }
 
       // 触发匹配计算
