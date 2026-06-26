@@ -104,22 +104,41 @@ export async function parseResume(filePath: string): Promise<ParseResult> {
       };
     }
 
-    // 解析 PDF 文件 using pdf-parse
+    // 解析 PDF 文件 using pdfjs-dist (纯 JS 实现，无需原生依赖)
     let pdfData: {
       numpages: number;
       text: string;
     };
 
     try {
-      // 使用 pdf-parse 的正确方式
-      const pdfParse = require("pdf-parse");
+      // 使用 pdfjs-dist（Mozilla PDF.js）
+      const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
       
-      // pdf-parse 直接接受 Buffer
-      const data = await pdfParse(dataBuffer);
+      // 加载 PDF 文档
+      const loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(dataBuffer),
+      });
+      
+      const pdfDocument = await loadingTask.promise;
+      const numPages = pdfDocument.numPages;
+      
+      // 提取所有页面的文本
+      const textPromises = [];
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        textPromises.push(
+          pdfDocument.getPage(pageNum).then(async (page: any) => {
+            const textContent = await page.getTextContent();
+            return textContent.items.map((item: any) => item.str).join(" ");
+          })
+        );
+      }
+      
+      const pageTexts = await Promise.all(textPromises);
+      const fullText = pageTexts.join("\n");
       
       pdfData = {
-        numpages: data.numpages,
-        text: data.text,
+        numpages: numPages,
+        text: fullText,
       };
     } catch (parseError) {
       console.error("PDF parsing failed:", parseError);
@@ -233,13 +252,16 @@ export async function getPDFMetadata(filePath: string): Promise<{
     // 读取文件内容
     const dataBuffer = await fs.readFile(fullPath);
 
-    // 使用 pdf-parse 解析
-    const pdfParse = require("pdf-parse");
-    const data = await pdfParse(dataBuffer);
+    // 使用 pdfjs-dist 解析
+    const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
+    const loadingTask = pdfjsLib.getDocument({
+      data: new Uint8Array(dataBuffer),
+    });
+    const pdfDocument = await loadingTask.promise;
 
     return {
       success: true,
-      pageCount: data.numpages,
+      pageCount: pdfDocument.numPages,
     };
   } catch (error) {
     console.error("Failed to get PDF metadata:", error);
