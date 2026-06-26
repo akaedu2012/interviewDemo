@@ -104,31 +104,23 @@ export async function parseResume(filePath: string): Promise<ParseResult> {
       };
     }
 
-    // Convert Buffer to Uint8Array (pdf-parse requires Uint8Array)
-    const uint8Array = new Uint8Array(dataBuffer);
-
-    // 解析 PDF 文件 using pdf-parse API
+    // 解析 PDF 文件 using pdf-parse
     let pdfData: {
       numpages: number;
       text: string;
     };
 
     try {
-      // Dynamically require pdf-parse to avoid webpack bundling issues
-      const { PDFParse } = require("pdf-parse");
+      // 使用 pdf-parse 的正确方式
+      const pdfParse = require("pdf-parse");
       
-      // Create parser instance and extract text
-      const parser = new PDFParse(uint8Array);
-      await parser.load(); // Load the PDF first
-      const result = await parser.getText();
+      // pdf-parse 直接接受 Buffer
+      const data = await pdfParse(dataBuffer);
       
       pdfData = {
-        numpages: result.total || 0,
-        text: result.text || "",
+        numpages: data.numpages,
+        text: data.text,
       };
-      
-      // Clean up
-      await parser.destroy();
     } catch (parseError) {
       console.error("PDF parsing failed:", parseError);
       
@@ -241,19 +233,13 @@ export async function getPDFMetadata(filePath: string): Promise<{
     // 读取文件内容
     const dataBuffer = await fs.readFile(fullPath);
 
-    // Convert Buffer to Uint8Array
-    const uint8Array = new Uint8Array(dataBuffer);
-
-    // 解析 PDF（只获取元数据）
-    const { PDFParse } = require("pdf-parse");
-    const parser = new PDFParse(uint8Array);
-    await parser.load();
-    const result = await parser.getText();
-    await parser.destroy();
+    // 使用 pdf-parse 解析
+    const pdfParse = require("pdf-parse");
+    const data = await pdfParse(dataBuffer);
 
     return {
       success: true,
-      pageCount: result.total || 0,
+      pageCount: data.numpages,
     };
   } catch (error) {
     console.error("Failed to get PDF metadata:", error);
