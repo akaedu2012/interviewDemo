@@ -162,6 +162,26 @@ if (needsInit) {
     `);
     
     log(`表结构和索引创建成功`);
+    
+    // 插入默认岗位描述（如果是新数据库）
+    const defaultJobId = 'default-job-' + Date.now();
+    sqlite.exec(`
+      INSERT INTO job_descriptions (
+        id, title, description, required_skills, preferred_skills, 
+        is_active, created_at, updated_at
+      ) VALUES (
+        '${defaultJobId}',
+        '全栈开发工程师',
+        '我们正在寻找一位经验丰富的全栈开发工程师，负责开发和维护公司的核心产品。',
+        '["JavaScript","React","Node.js","TypeScript","数据库设计"]',
+        '["Next.js","Docker","AWS","CI/CD","微服务架构"]',
+        1,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+      )
+    `);
+    
+    log(`默认岗位描述创建成功`);
   } catch (error) {
     log(`表结构创建失败: ${error instanceof Error ? error.message : '未知错误'}`);
     throw error;
