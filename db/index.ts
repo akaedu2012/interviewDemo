@@ -66,14 +66,14 @@ if (needsInit) {
     sqlite.exec(`
       CREATE TABLE IF NOT EXISTS candidates (
         id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
+        name TEXT,
         phone TEXT,
         email TEXT,
         city TEXT,
-        status TEXT DEFAULT 'pending',
-        file_name TEXT,
-        file_path TEXT,
-        file_size INTEGER,
+        file_name TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        file_size INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT '待筛选',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
@@ -85,11 +85,9 @@ if (needsInit) {
         id TEXT PRIMARY KEY,
         candidate_id TEXT NOT NULL,
         school TEXT NOT NULL,
-        degree TEXT,
-        major TEXT,
-        start_date TEXT,
-        end_date TEXT,
-        description TEXT,
+        major TEXT NOT NULL,
+        degree TEXT NOT NULL,
+        graduation_time TEXT NOT NULL,
         FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
       )
     `);
@@ -100,10 +98,10 @@ if (needsInit) {
         id TEXT PRIMARY KEY,
         candidate_id TEXT NOT NULL,
         company TEXT NOT NULL,
-        position TEXT NOT NULL,
-        start_date TEXT,
-        end_date TEXT,
-        description TEXT,
+        title TEXT NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT NOT NULL,
+        responsibilities TEXT NOT NULL,
         FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE
       )
     `);
@@ -124,11 +122,9 @@ if (needsInit) {
       CREATE TABLE IF NOT EXISTS job_descriptions (
         id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
-        required_skills TEXT,
-        preferred_skills TEXT,
-        min_education TEXT,
-        min_experience INTEGER,
-        job_description TEXT,
+        description TEXT NOT NULL,
+        required_skills TEXT NOT NULL,
+        preferred_skills TEXT NOT NULL,
         is_active INTEGER DEFAULT 1,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -141,12 +137,12 @@ if (needsInit) {
         id TEXT PRIMARY KEY,
         candidate_id TEXT NOT NULL,
         job_id TEXT NOT NULL,
-        overall_score INTEGER NOT NULL,
-        skills_score INTEGER,
-        experience_score INTEGER,
-        education_score INTEGER,
-        ai_commentary TEXT,
-        matched_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        overall_score REAL NOT NULL,
+        skill_score REAL NOT NULL,
+        experience_score REAL NOT NULL,
+        education_score REAL NOT NULL,
+        commentary TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (candidate_id) REFERENCES candidates(id) ON DELETE CASCADE,
         FOREIGN KEY (job_id) REFERENCES job_descriptions(id) ON DELETE CASCADE
       )
