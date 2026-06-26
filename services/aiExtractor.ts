@@ -360,14 +360,53 @@ export async function* extractAll(
 ): AsyncGenerator<ExtractionProgress> {
   try {
     console.log("开始并行提取所有信息...");
+    console.log(`简历文本长度: ${resumeText.length} 字符`);
     
     // 并行提取所有信息以加快速度（关键优化！）
-    const [basicInfo, education, experience, skills] = await Promise.all([
+    // 添加详细的错误处理
+    const results = await Promise.allSettled([
       extractBasicInfo(resumeText),
       extractEducation(resumeText),
       extractExperience(resumeText),
       extractSkills(resumeText),
     ]);
+
+    console.log("并行提取完成，检查结果...");
+
+    // 检查每个结果
+    const [basicInfoResult, educationResult, experienceResult, skillsResult] = results;
+
+    // 基本信息
+    if (basicInfoResult.status === 'rejected') {
+      console.error("基本信息提取失败:", basicInfoResult.reason);
+      throw new Error(`基本信息提取失败: ${basicInfoResult.reason}`);
+    }
+    const basicInfo = basicInfoResult.value;
+    console.log("✓ 基本信息提取成功");
+
+    // 教育背景
+    if (educationResult.status === 'rejected') {
+      console.error("教育背景提取失败:", educationResult.reason);
+      throw new Error(`教育背景提取失败: ${educationResult.reason}`);
+    }
+    const education = educationResult.value;
+    console.log("✓ 教育背景提取成功");
+
+    // 工作经历
+    if (experienceResult.status === 'rejected') {
+      console.error("工作经历提取失败:", experienceResult.reason);
+      throw new Error(`工作经历提取失败: ${experienceResult.reason}`);
+    }
+    const experience = experienceResult.value;
+    console.log("✓ 工作经历提取成功");
+
+    // 技能标签
+    if (skillsResult.status === 'rejected') {
+      console.error("技能标签提取失败:", skillsResult.reason);
+      throw new Error(`技能标签提取失败: ${skillsResult.reason}`);
+    }
+    const skills = skillsResult.value;
+    console.log("✓ 技能标签提取成功");
 
     console.log("所有信息提取完成");
 
