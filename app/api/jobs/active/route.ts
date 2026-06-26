@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getActiveJob } from "@/services/jobManager";
+import { dbInitPromise } from "@/db";
 
 /**
  * GET /api/jobs/active
@@ -35,6 +36,9 @@ import { getActiveJob } from "@/services/jobManager";
  */
 export async function GET(request: NextRequest) {
   try {
+    // 等待数据库初始化完成
+    await dbInitPromise;
+    
     // 调用 Job Manager 获取激活的岗位描述
     const job = await getActiveJob();
 

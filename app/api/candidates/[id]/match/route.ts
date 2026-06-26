@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getCandidateById, saveMatchScore } from "@/services/candidateManager";
 import { getJobById } from "@/services/jobManager";
 import { calculateMatch } from "@/services/jobMatcher";
+import { dbInitPromise } from "@/db";
 
 /**
  * 任务 6.6 - 实现匹配评分计算触发 API
@@ -28,6 +29,9 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    // 等待数据库初始化完成
+    await dbInitPromise;
+    
     const candidateId = params.id;
 
     // 1. 解析和验证请求体

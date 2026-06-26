@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { updateCandidateStatus, getCandidateById } from "@/services/candidateManager";
+import { dbInitPromise } from "@/db";
 import type { CandidateStatus } from "@/types";
 
 // Zod schema for validating candidate status
@@ -53,6 +54,9 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    // 等待数据库初始化完成
+    await dbInitPromise;
+    
     const candidateId = params.id;
 
     // 验证候选人是否存在

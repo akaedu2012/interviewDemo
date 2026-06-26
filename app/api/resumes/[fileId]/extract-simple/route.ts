@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseResume } from "@/services/pdfParser";
 import { extractBasicInfo, extractEducation, extractExperience, extractSkills } from "@/services/aiExtractor";
 import { createCandidate } from "@/services/candidateManager";
+import { dbInitPromise } from "@/db";
 import type { Skills } from "@/types";
 import path from "path";
 import { promises as fs } from "fs";
@@ -26,6 +27,9 @@ export async function POST(
   { params }: { params: { fileId: string } }
 ) {
   try {
+    // 等待数据库初始化完成
+    await dbInitPromise;
+    
     const { fileId } = params;
 
     // 验证 fileId

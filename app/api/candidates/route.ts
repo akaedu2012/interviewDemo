@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { listCandidates } from "@/services/candidateManager";
+import { dbInitPromise } from "@/db";
 import type { ApiResponse, PaginatedResult, Candidate } from "@/types";
 
 // 标记此路由为动态路由
@@ -37,6 +38,9 @@ const queryParamsSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
+    // 等待数据库初始化完成
+    await dbInitPromise;
+    
     // 获取查询参数
     const { searchParams } = new URL(request.url);
     

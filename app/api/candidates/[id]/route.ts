@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCandidateById } from "@/services/candidateManager";
+import { dbInitPromise } from "@/db";
 
 /**
  * GET /api/candidates/[id]
@@ -19,6 +20,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // 等待数据库初始化完成
+    await dbInitPromise;
+    
     const { id } = params;
 
     // 验证 ID 参数

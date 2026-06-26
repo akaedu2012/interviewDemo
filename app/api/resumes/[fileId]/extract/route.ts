@@ -19,6 +19,7 @@ import { NextRequest } from "next/server";
 import { parseResume } from "@/services/pdfParser";
 import { extractAll } from "@/services/aiExtractor";
 import { createCandidate } from "@/services/candidateManager";
+import { dbInitPromise } from "@/db";
 import type { Skills, SkillEntry } from "@/types";
 import path from "path";
 import { promises as fs } from "fs";
@@ -63,6 +64,21 @@ export async function GET(
   
   const stream = new ReadableStream({
     async start(controller) {
+      // 等待数据库初始化完成
+      try {
+        await dbInitPromise;
+      } catch (error) {
+        console.error("[Extract SSE] 数据库初始化失败:", error);
+        const encoder = new TextEncoder();
+        const message = `event: error\ndata: ${JSON.stringify({
+          error: "数据库初始化失败",
+          code: "DATABASE_INIT_ERROR"
+        })}\n\n`;
+        controller.enqueue(encoder.encode(message));
+        controller.close();
+        return;
+      }
+      
       // 辅助函数：发送 SSE 事件
       const sendEvent = (event: string, data: any) => {
         try {

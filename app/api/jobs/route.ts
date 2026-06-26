@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createOrUpdateJob } from "@/services/jobManager";
+import { dbInitPromise } from "@/db";
 
 // Zod schema for validating job description data
 const jobDescriptionSchema = z.object({
@@ -53,6 +54,9 @@ const jobDescriptionSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
+    // 等待数据库初始化完成
+    await dbInitPromise;
+    
     // 解析请求体
     const body = await request.json();
 
