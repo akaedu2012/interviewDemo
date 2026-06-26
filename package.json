@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run db:push && next build",
-    "build:vercel": "npm run db:push && next build",
+    "build": "next build",
+    "build:vercel": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",

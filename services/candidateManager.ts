@@ -189,7 +189,7 @@ export async function getCandidateById(
       status: candidate.status as CandidateStatus,
       createdAt: new Date(candidate.createdAt),
       updatedAt: new Date(candidate.updatedAt),
-      education: educationData.map((edu) => ({
+      education: educationData.map((edu: typeof education.$inferSelect) => ({
         id: edu.id,
         candidateId: edu.candidateId,
         school: edu.school,
@@ -197,7 +197,7 @@ export async function getCandidateById(
         degree: edu.degree,
         graduationTime: edu.graduationTime,
       })),
-      experience: experienceData.map((exp) => ({
+      experience: experienceData.map((exp: typeof experience.$inferSelect) => ({
         id: exp.id,
         candidateId: exp.candidateId,
         company: exp.company,
@@ -206,7 +206,7 @@ export async function getCandidateById(
         endDate: exp.endDate,
         responsibilities: exp.responsibilities,
       })),
-      skills: skillsData.map((skill) => ({
+      skills: skillsData.map((skill: typeof skills.$inferSelect) => ({
         id: skill.id,
         candidateId: skill.candidateId,
         skillType: skill.skillType as "technical" | "tool" | "language",
