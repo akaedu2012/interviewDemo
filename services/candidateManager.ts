@@ -306,10 +306,10 @@ export async function listCandidates(
         .where(like(education.school, keyword));
 
       const candidateIdsFromSkills = candidateIdsWithKeywordInSkills.map(
-        (s) => s.candidateId
+        (s: typeof skills.$inferSelect) => s.candidateId
       );
       const candidateIdsFromEducation = candidateIdsWithKeywordInEducation.map(
-        (e) => e.candidateId
+        (e: typeof education.$inferSelect) => e.candidateId
       );
 
       const allCandidateIds = [
